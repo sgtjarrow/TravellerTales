@@ -1,6 +1,7 @@
 <Window x:Class="TravellerTales.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TravellerTales.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -14,40 +15,29 @@
         Foreground="{StaticResource AppForegroundBrush}"
         FontFamily="Segoe UI">
     <Window.Resources>
-        <Style x:Key="LandingOverlayButtonStyle" TargetType="Button">
+        <Style x:Key="LandingPolygonButtonStyle" TargetType="{x:Type controls:PolygonButton}">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Foreground" Value="Transparent" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HoverFill" Value="#224AA3FF" />
+            <Setter Property="HoverStroke" Value="#CC7EC7FF" />
+            <Setter Property="PressedFill" Value="#334AA3FF" />
+            <Setter Property="StrokeThickness" Value="2" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="ButtonFrame"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="#00FFFFFF"
-                                BorderThickness="2"
-                                CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Stretch"
-                                              VerticalAlignment="Stretch" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonFrame" Property="Background" Value="#224AA3FF" />
-                                <Setter TargetName="ButtonFrame" Property="BorderBrush" Value="#AA7EC7FF" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonFrame" Property="Background" Value="#334AA3FF" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Cursor" Value="Arrow" />
-                                <Setter TargetName="ButtonFrame" Property="Background" Value="Transparent" />
-                                <Setter TargetName="ButtonFrame" Property="BorderBrush" Value="#00FFFFFF" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                    <ControlTemplate TargetType="{x:Type controls:PolygonButton}">
+                        <ContentPresenter HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Stretch" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Cursor" Value="Arrow" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="PlaceholderButtonStyle" TargetType="Button">
@@ -73,61 +63,50 @@
                     <Image Source="pack://application:,,,/Assets/landing.png"
                            Stretch="Fill" />
 
-                <Button x:Name="ContinueButton"
-                        Width="395"
-                        Height="72"
-                        Margin="1217,143,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        IsEnabled="False"
-                        AutomationProperties.Name="Continue"
-                        ToolTip="Continue will be available when an in-progress character exists."
-                        Style="{StaticResource LandingOverlayButtonStyle}" />
-                <Button Width="395"
-                        Height="72"
-                        Margin="1217,231,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Click="OnNewCharacter"
-                        AutomationProperties.Name="New Character"
-                        ToolTip="New Character"
-                        Style="{StaticResource LandingOverlayButtonStyle}" />
-                <Button Width="395"
-                        Height="72"
-                        Margin="1217,320,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Click="OnEditNarratives"
-                        AutomationProperties.Name="Edit Narratives"
-                        ToolTip="Edit Narratives"
-                        Style="{StaticResource LandingOverlayButtonStyle}" />
-                <Button Width="395"
-                        Height="72"
-                        Margin="1217,410,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Click="OnSettings"
-                        AutomationProperties.Name="Settings"
-                        ToolTip="Settings"
-                        Style="{StaticResource LandingOverlayButtonStyle}" />
-                <Button Width="395"
-                        Height="72"
-                        Margin="1217,498,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Click="OnCredits"
-                        AutomationProperties.Name="Credits"
-                        ToolTip="Credits"
-                        Style="{StaticResource LandingOverlayButtonStyle}" />
-                <Button Width="395"
-                        Height="72"
-                        Margin="1217,586,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Click="OnExit"
-                        AutomationProperties.Name="Exit"
-                        ToolTip="Exit"
-                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                    <controls:PolygonButton x:Name="ContinueButton"
+                                            Width="1672"
+                                            Height="941"
+                                            IsEnabled="False"
+                                            AutomationProperties.Name="Continue"
+                                            ToolTip="Continue will be available when an in-progress character exists."
+                                            ToolTipService.ShowOnDisabled="True"
+                                            ShapeData="M 1249,135 L 1592,135 L 1609,153 L 1601,185 L 1576,205 L 1243,215 L 1223,194 L 1227,157 Z"
+                                            Style="{StaticResource LandingPolygonButtonStyle}" />
+                    <controls:PolygonButton Width="1672"
+                                            Height="941"
+                                            Click="OnNewCharacter"
+                                            AutomationProperties.Name="New Character"
+                                            ToolTip="New Character"
+                                            ShapeData="M 1242,223 L 1586,226 L 1604,246 L 1596,276 L 1571,295 L 1235,304 L 1214,283 L 1218,246 Z"
+                                            Style="{StaticResource LandingPolygonButtonStyle}" />
+                    <controls:PolygonButton Width="1672"
+                                            Height="941"
+                                            Click="OnEditNarratives"
+                                            AutomationProperties.Name="Edit Narratives"
+                                            ToolTip="Edit Narratives"
+                                            ShapeData="M 1236,313 L 1579,316 L 1596,337 L 1588,367 L 1563,386 L 1228,394 L 1207,373 L 1211,335 Z"
+                                            Style="{StaticResource LandingPolygonButtonStyle}" />
+                    <controls:PolygonButton Width="1672"
+                                            Height="941"
+                                            Click="OnSettings"
+                                            AutomationProperties.Name="Settings"
+                                            ToolTip="Settings"
+                                            ShapeData="M 1229,402 L 1572,407 L 1589,427 L 1581,458 L 1556,477 L 1221,484 L 1200,462 L 1204,424 Z"
+                                            Style="{StaticResource LandingPolygonButtonStyle}" />
+                    <controls:PolygonButton Width="1672"
+                                            Height="941"
+                                            Click="OnCredits"
+                                            AutomationProperties.Name="Credits"
+                                            ToolTip="Credits"
+                                            ShapeData="M 1221,490 L 1565,496 L 1582,516 L 1574,548 L 1549,566 L 1214,572 L 1193,551 L 1197,512 Z"
+                                            Style="{StaticResource LandingPolygonButtonStyle}" />
+                    <controls:PolygonButton Width="1672"
+                                            Height="941"
+                                            Click="OnExit"
+                                            AutomationProperties.Name="Exit"
+                                            ToolTip="Exit"
+                                            ShapeData="M 1213,578 L 1557,586 L 1575,607 L 1567,639 L 1542,657 L 1206,662 L 1186,640 L 1190,601 Z"
+                                            Style="{StaticResource LandingPolygonButtonStyle}" />
                 </Grid>
             </Viewbox>
         </Grid>
