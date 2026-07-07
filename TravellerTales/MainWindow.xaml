@@ -22,11 +22,11 @@
             <Setter Property="Foreground" Value="Transparent" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="HoverFill" Value="#224AA3FF" />
-            <Setter Property="HoverStroke" Value="#FFFFFFFF" />
+            <Setter Property="HoverStroke" Value="Transparent" />
             <Setter Property="PressedFill" Value="#334AA3FF" />
             <Setter Property="ShapeFill" Value="#55FF3B30" />
-            <Setter Property="ShapeStroke" Value="#F2FFFFFF" />
-            <Setter Property="StrokeThickness" Value="3" />
+            <Setter Property="ShapeStroke" Value="Transparent" />
+            <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type controls:PolygonButton}">
@@ -73,8 +73,8 @@
                                             ToolTip="Continue will be available when an in-progress character exists."
                                             ToolTipService.ShowOnDisabled="True"
                                             ShapeFill="#55FF3B30"
-                                            ShapeStroke="#F2FFFFFF"
-                                            ShapeData="M 1264,145 L 1592,135 L 1608,153 L 1601,185 L 1575,207 L 1243,215 L 1223,194 L 1240,168 Z"
+                                            ShapeStroke="Transparent"
+                                            ShapeData="M 1248,117 L 1599,117 L 1624,144 L 1614,191 L 1582,219 L 1241,219 L 1216,194 L 1220,143 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -82,8 +82,8 @@
                                             AutomationProperties.Name="New Character"
                                             ToolTip="New Character"
                                             ShapeFill="#5500C853"
-                                            ShapeStroke="#F2FFFFFF"
-                                            ShapeData="M 1256,223 L 1586,226 L 1604,246 L 1596,276 L 1571,295 L 1248,304 L 1228,283 L 1232,247 Z"
+                                            ShapeStroke="Transparent"
+                                            ShapeData="M 1239,221 L 1588,224 L 1610,249 L 1601,287 L 1574,306 L 1232,306 L 1205,283 L 1210,247 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -91,8 +91,8 @@
                                             AutomationProperties.Name="Edit Narratives"
                                             ToolTip="Edit Narratives"
                                             ShapeFill="#552978FF"
-                                            ShapeStroke="#F2FFFFFF"
-                                            ShapeData="M 1236,313 L 1579,316 L 1596,337 L 1588,367 L 1563,386 L 1243,383 L 1221,362 L 1211,335 Z"
+                                            ShapeStroke="Transparent"
+                                            ShapeData="M 1230,311 L 1580,315 L 1604,340 L 1595,378 L 1566,397 L 1224,395 L 1197,373 L 1202,335 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -100,8 +100,8 @@
                                             AutomationProperties.Name="Settings"
                                             ToolTip="Settings"
                                             ShapeFill="#55FFD600"
-                                            ShapeStroke="#F2FFFFFF"
-                                            ShapeData="M 1242,389 L 1557,406 L 1574,427 L 1566,458 L 1541,477 L 1236,473 L 1214,451 L 1219,414 Z"
+                                            ShapeStroke="Transparent"
+                                            ShapeData="M 1222,400 L 1572,406 L 1596,432 L 1587,470 L 1558,488 L 1216,485 L 1188,462 L 1194,425 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -109,8 +109,8 @@
                                             AutomationProperties.Name="Credits"
                                             ToolTip="Credits"
                                             ShapeFill="#55D500F9"
-                                            ShapeStroke="#F2FFFFFF"
-                                            ShapeData="M 1235,478 L 1548,504 L 1565,524 L 1557,548 L 1549,566 L 1229,561 L 1207,540 L 1212,502 Z"
+                                            ShapeStroke="Transparent"
+                                            ShapeData="M 1215,489 L 1565,497 L 1589,523 L 1580,560 L 1552,578 L 1208,574 L 1181,551 L 1187,513 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -118,8 +118,8 @@
                                             AutomationProperties.Name="Exit"
                                             ToolTip="Exit"
                                             ShapeFill="#55FF6D00"
-                                            ShapeStroke="#F2FFFFFF"
-                                            ShapeData="M 1227,567 L 1540,594 L 1558,615 L 1550,639 L 1542,657 L 1221,651 L 1200,629 L 1205,591 Z"
+                                            ShapeStroke="Transparent"
+                                            ShapeData="M 1208,578 L 1558,586 L 1582,612 L 1573,650 L 1545,668 L 1201,664 L 1174,640 L 1180,602 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                 </Grid>
             </Viewbox>
