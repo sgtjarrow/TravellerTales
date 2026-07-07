@@ -9,7 +9,7 @@
         Icon="pack://application:,,,/Assets/icon.ico"
         Background="Black"
         ShowInTaskbar="False"
-        FontFamily="Segoe UI">
+        FontFamily="{StaticResource BodyTextFontFamily}">
     <Grid Background="Black">
         <Image Source="pack://application:,,,/Assets/captains_guild.png"
                Stretch="UniformToFill"
@@ -18,17 +18,19 @@
 
         <Grid Background="#33000000" />
 
-        <StackPanel Margin="72"
+        <StackPanel Margin="80,72,0,0"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom">
+                    VerticalAlignment="Top">
             <TextBlock Text="Traveller Tales"
+                       Style="{StaticResource AppTitleTextStyle}"
                        Foreground="#F6F2EA"
-                       FontSize="64"
-                       FontWeight="SemiBold" />
+                       FontSize="128"
+                       FontWeight="Bold" />
             <TextBlock Text="Loading local archives..."
+                       Style="{StaticResource BodyTextStyle}"
                        Foreground="#D8D2C8"
-                       FontSize="24"
-                       Margin="4,8,0,0" />
+                       FontSize="30"
+                       Margin="8,10,0,0" />
         </StackPanel>
     </Grid>
 </Window>
