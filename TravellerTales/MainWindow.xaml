@@ -72,7 +72,7 @@
                                             AutomationProperties.Name="Continue"
                                             ToolTip="Continue will be available when an in-progress character exists."
                                             ToolTipService.ShowOnDisabled="True"
-                                            ShapeFill="#55FF3B30"
+                                            ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
                                             ShapeData="M 696,399 L 970,399 L 970,439 L 696,439 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
@@ -81,7 +81,7 @@
                                             Click="OnNewCharacter"
                                             AutomationProperties.Name="New Character"
                                             ToolTip="New Character"
-                                            ShapeFill="#5500C853"
+                                            ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
                                             ShapeData="M 696,445 L 970,445 L 970,483 L 696,483 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
@@ -90,7 +90,7 @@
                                             Click="OnEditNarratives"
                                             AutomationProperties.Name="Edit Narratives"
                                             ToolTip="Edit Narratives"
-                                            ShapeFill="#552978FF"
+                                            ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
                                             ShapeData="M 696,490 L 970,490 L 970,529 L 696,529 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
@@ -99,7 +99,7 @@
                                             Click="OnSettings"
                                             AutomationProperties.Name="Settings"
                                             ToolTip="Settings"
-                                            ShapeFill="#55FFD600"
+                                            ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
                                             ShapeData="M 696,535 L 970,535 L 970,574 L 696,574 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
@@ -108,7 +108,7 @@
                                             Click="OnCredits"
                                             AutomationProperties.Name="Credits"
                                             ToolTip="Credits"
-                                            ShapeFill="#55D500F9"
+                                            ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
                                             ShapeData="M 696,580 L 970,580 L 970,619 L 696,619 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
@@ -117,7 +117,7 @@
                                             Click="OnExit"
                                             AutomationProperties.Name="Exit"
                                             ToolTip="Exit"
-                                            ShapeFill="#55FF6D00"
+                                            ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
                                             ShapeData="M 696,625 L 970,625 L 970,664 L 696,664 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
