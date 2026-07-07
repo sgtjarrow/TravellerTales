@@ -22,11 +22,11 @@
             <Setter Property="Foreground" Value="Transparent" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="HoverFill" Value="#224AA3FF" />
-            <Setter Property="HoverStroke" Value="#CC7EC7FF" />
+            <Setter Property="HoverStroke" Value="#FFFFFFFF" />
             <Setter Property="PressedFill" Value="#334AA3FF" />
             <Setter Property="ShapeFill" Value="#55FF3B30" />
-            <Setter Property="ShapeStroke" Value="#E6FF3B30" />
-            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="ShapeStroke" Value="#F2FFFFFF" />
+            <Setter Property="StrokeThickness" Value="3" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type controls:PolygonButton}">
@@ -73,8 +73,8 @@
                                             ToolTip="Continue will be available when an in-progress character exists."
                                             ToolTipService.ShowOnDisabled="True"
                                             ShapeFill="#55FF3B30"
-                                            ShapeStroke="#E6FF3B30"
-                                            ShapeData="M 1248,135 L 1592,135 L 1608,153 L 1601,185 L 1575,207 L 1243,215 L 1223,194 L 1227,158 Z"
+                                            ShapeStroke="#F2FFFFFF"
+                                            ShapeData="M 1264,145 L 1592,135 L 1608,153 L 1601,185 L 1575,207 L 1243,215 L 1223,194 L 1240,168 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -82,8 +82,8 @@
                                             AutomationProperties.Name="New Character"
                                             ToolTip="New Character"
                                             ShapeFill="#5500C853"
-                                            ShapeStroke="#E600C853"
-                                            ShapeData="M 1242,223 L 1586,226 L 1604,246 L 1596,276 L 1571,295 L 1235,304 L 1214,283 L 1218,247 Z"
+                                            ShapeStroke="#F2FFFFFF"
+                                            ShapeData="M 1256,223 L 1586,226 L 1604,246 L 1596,276 L 1571,295 L 1248,304 L 1228,283 L 1232,247 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -91,8 +91,8 @@
                                             AutomationProperties.Name="Edit Narratives"
                                             ToolTip="Edit Narratives"
                                             ShapeFill="#552978FF"
-                                            ShapeStroke="#E62978FF"
-                                            ShapeData="M 1236,313 L 1579,316 L 1596,337 L 1588,367 L 1563,386 L 1228,394 L 1207,373 L 1211,335 Z"
+                                            ShapeStroke="#F2FFFFFF"
+                                            ShapeData="M 1236,313 L 1579,316 L 1596,337 L 1588,367 L 1563,386 L 1243,383 L 1221,362 L 1211,335 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -100,8 +100,8 @@
                                             AutomationProperties.Name="Settings"
                                             ToolTip="Settings"
                                             ShapeFill="#55FFD600"
-                                            ShapeStroke="#E6FFD600"
-                                            ShapeData="M 1227,400 L 1572,406 L 1589,427 L 1581,458 L 1556,477 L 1221,484 L 1199,462 L 1204,425 Z"
+                                            ShapeStroke="#F2FFFFFF"
+                                            ShapeData="M 1242,389 L 1557,406 L 1574,427 L 1566,458 L 1541,477 L 1236,473 L 1214,451 L 1219,414 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -109,8 +109,8 @@
                                             AutomationProperties.Name="Credits"
                                             ToolTip="Credits"
                                             ShapeFill="#55D500F9"
-                                            ShapeStroke="#E6D500F9"
-                                            ShapeData="M 1220,489 L 1565,496 L 1582,516 L 1574,548 L 1549,566 L 1214,572 L 1192,551 L 1197,513 Z"
+                                            ShapeStroke="#F2FFFFFF"
+                                            ShapeData="M 1235,478 L 1548,504 L 1565,524 L 1557,548 L 1549,566 L 1229,561 L 1207,540 L 1212,502 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -118,8 +118,8 @@
                                             AutomationProperties.Name="Exit"
                                             ToolTip="Exit"
                                             ShapeFill="#55FF6D00"
-                                            ShapeStroke="#E6FF6D00"
-                                            ShapeData="M 1212,578 L 1557,586 L 1575,607 L 1567,639 L 1542,657 L 1206,662 L 1185,640 L 1190,602 Z"
+                                            ShapeStroke="#F2FFFFFF"
+                                            ShapeData="M 1227,567 L 1540,594 L 1558,615 L 1550,639 L 1542,657 L 1221,651 L 1200,629 L 1205,591 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                 </Grid>
             </Viewbox>
