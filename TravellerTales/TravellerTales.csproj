@@ -13,9 +13,13 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Assets\Fonts\Licenses\*.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="Assets\captains_guild.png" />
     <Resource Include="Assets\landing.png" />
     <Resource Include="Assets\icon.ico" />
+    <Resource Include="Assets\Fonts\*.ttf" />
   </ItemGroup>
 
 </Project>

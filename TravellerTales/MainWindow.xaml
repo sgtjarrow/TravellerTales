@@ -50,6 +50,8 @@
             <Setter Property="BorderBrush" Value="#4FA7FF" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="#EAF6FF" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
+            <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="FontSize" Value="18" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
