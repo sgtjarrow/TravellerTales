@@ -20,6 +20,20 @@ public sealed class PolygonButton : Button
             typeof(PolygonButton),
             new FrameworkPropertyMetadata(Brushes.Transparent, FrameworkPropertyMetadataOptions.AffectsRender));
 
+    public static readonly DependencyProperty ShapeFillProperty =
+        DependencyProperty.Register(
+            nameof(ShapeFill),
+            typeof(Brush),
+            typeof(PolygonButton),
+            new FrameworkPropertyMetadata(Brushes.Transparent, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    public static readonly DependencyProperty ShapeStrokeProperty =
+        DependencyProperty.Register(
+            nameof(ShapeStroke),
+            typeof(Brush),
+            typeof(PolygonButton),
+            new FrameworkPropertyMetadata(Brushes.Transparent, FrameworkPropertyMetadataOptions.AffectsRender));
+
     public static readonly DependencyProperty HoverStrokeProperty =
         DependencyProperty.Register(
             nameof(HoverStroke),
@@ -60,6 +74,18 @@ public sealed class PolygonButton : Button
         set => SetValue(HoverFillProperty, value);
     }
 
+    public Brush ShapeFill
+    {
+        get => (Brush)GetValue(ShapeFillProperty);
+        set => SetValue(ShapeFillProperty, value);
+    }
+
+    public Brush ShapeStroke
+    {
+        get => (Brush)GetValue(ShapeStrokeProperty);
+        set => SetValue(ShapeStrokeProperty, value);
+    }
+
     public Brush HoverStroke
     {
         get => (Brush)GetValue(HoverStrokeProperty);
@@ -96,13 +122,14 @@ public sealed class PolygonButton : Button
         base.OnRender(drawingContext);
 
         var shape = ShapeData;
-        if (shape is null || !IsEnabled || (!IsMouseOver && !IsKeyboardFocused))
+        if (shape is null)
         {
             return;
         }
 
-        var fill = IsPressed ? PressedFill : HoverFill;
-        var pen = new Pen(HoverStroke, StrokeThickness);
+        var fill = IsPressed ? PressedFill : IsMouseOver || IsKeyboardFocused ? HoverFill : ShapeFill;
+        var stroke = IsMouseOver || IsKeyboardFocused || IsPressed ? HoverStroke : ShapeStroke;
+        var pen = new Pen(stroke, StrokeThickness);
         drawingContext.DrawGeometry(fill, pen, shape);
     }
 }
