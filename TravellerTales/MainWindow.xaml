@@ -6,81 +6,165 @@
         mc:Ignorable="d"
         Title="Traveller Tales"
         MinHeight="720"
-        MinWidth="1100"
+        MinWidth="1280"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
         Icon="pack://application:,,,/Assets/icon.ico"
-        Background="{StaticResource AppBackgroundBrush}"
+        Background="Black"
         Foreground="{StaticResource AppForegroundBrush}"
         FontFamily="Segoe UI">
-    <Grid Background="{StaticResource AppBackgroundBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <Style x:Key="LandingOverlayButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonFrame"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#00FFFFFF"
+                                BorderThickness="2"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonFrame" Property="Background" Value="#224AA3FF" />
+                                <Setter TargetName="ButtonFrame" Property="BorderBrush" Value="#AA7EC7FF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonFrame" Property="Background" Value="#334AA3FF" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Cursor" Value="Arrow" />
+                                <Setter TargetName="ButtonFrame" Property="Background" Value="Transparent" />
+                                <Setter TargetName="ButtonFrame" Property="BorderBrush" Value="#00FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <Grid MaxWidth="1680"
-              Margin="72,64"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="520" />
-            </Grid.ColumnDefinitions>
+        <Style x:Key="PlaceholderButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="46" />
+            <Setter Property="Padding" Value="22,8" />
+            <Setter Property="Background" Value="#151D2A" />
+            <Setter Property="BorderBrush" Value="#4FA7FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#EAF6FF" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+    </Window.Resources>
 
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="Traveller Tales"
-                           FontSize="72"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource AppForegroundBrush}" />
-                <TextBlock Margin="0,20,0,0"
-                           MaxWidth="860"
-                           Text="Create characters and preserve the narrative details that shape their journeys."
-                           TextWrapping="Wrap"
-                           FontSize="28"
-                           LineHeight="38"
-                           Foreground="#D8D2C8" />
-            </StackPanel>
+    <Grid Background="Black">
+        <Grid x:Name="LandingView" Visibility="Visible">
+            <Viewbox Stretch="UniformToFill"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Stretch">
+                <Grid Width="1672"
+                      Height="941"
+                      IsHitTestVisible="True">
+                    <Image Source="pack://application:,,,/Assets/landing.png"
+                           Stretch="Fill" />
 
-            <Border Grid.Column="1"
-                    Padding="36"
-                    Background="#101010"
-                    BorderBrush="#383028"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    VerticalAlignment="Center">
-                <StackPanel>
-                    <TextBlock Text="Character Files"
-                               FontSize="28"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource AppForegroundBrush}" />
-                    <TextBlock Margin="0,8,0,28"
-                               Text="{Binding DataLocationText}"
-                               TextWrapping="Wrap"
-                               FontSize="15"
-                               Foreground="#BBB4AA" />
-
-                    <Button Content="New Character"
-                            Click="OnPlaceholderAction"
-                            Style="{StaticResource LandingButtonStyle}" />
-                    <Button Content="Open Character"
-                            Click="OnPlaceholderAction"
-                            Style="{StaticResource LandingButtonStyle}" />
-                    <Button Content="Import JSON"
-                            Click="OnPlaceholderAction"
-                            Style="{StaticResource LandingButtonStyle}" />
-                    <Button Content="Export JSON"
-                            Click="OnPlaceholderAction"
-                            Style="{StaticResource LandingButtonStyle}" />
-                </StackPanel>
-            </Border>
+                <Button x:Name="ContinueButton"
+                        Width="395"
+                        Height="72"
+                        Margin="1217,143,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        IsEnabled="False"
+                        AutomationProperties.Name="Continue"
+                        ToolTip="Continue will be available when an in-progress character exists."
+                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                <Button Width="395"
+                        Height="72"
+                        Margin="1217,231,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="OnNewCharacter"
+                        AutomationProperties.Name="New Character"
+                        ToolTip="New Character"
+                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                <Button Width="395"
+                        Height="72"
+                        Margin="1217,320,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="OnEditNarratives"
+                        AutomationProperties.Name="Edit Narratives"
+                        ToolTip="Edit Narratives"
+                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                <Button Width="395"
+                        Height="72"
+                        Margin="1217,410,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="OnSettings"
+                        AutomationProperties.Name="Settings"
+                        ToolTip="Settings"
+                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                <Button Width="395"
+                        Height="72"
+                        Margin="1217,498,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="OnCredits"
+                        AutomationProperties.Name="Credits"
+                        ToolTip="Credits"
+                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                <Button Width="395"
+                        Height="72"
+                        Margin="1217,586,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Click="OnExit"
+                        AutomationProperties.Name="Exit"
+                        ToolTip="Exit"
+                        Style="{StaticResource LandingOverlayButtonStyle}" />
+                </Grid>
+            </Viewbox>
         </Grid>
 
-        <TextBlock Grid.Row="1"
-                   Margin="32"
-                   HorizontalAlignment="Right"
-                   Text="Local JSON storage. No online resources required."
-                   FontSize="16"
-                   Foreground="#8F877C" />
+        <Grid x:Name="PlaceholderView"
+              Visibility="Collapsed"
+              Background="#EE05080F">
+            <Grid MaxWidth="1180"
+                  Margin="72"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock x:Name="PlaceholderTitle"
+                           Text="Placeholder"
+                           FontSize="54"
+                           FontWeight="SemiBold"
+                           Foreground="#EAF6FF" />
+                <TextBlock x:Name="PlaceholderBody"
+                           Grid.Row="1"
+                           Margin="0,22,0,34"
+                           TextWrapping="Wrap"
+                           FontSize="24"
+                           LineHeight="34"
+                           Foreground="#BEDFFF" />
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal">
+                    <Button Content="Back"
+                            Click="OnBackToLanding"
+                            AutomationProperties.Name="Back"
+                            Style="{StaticResource PlaceholderButtonStyle}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
