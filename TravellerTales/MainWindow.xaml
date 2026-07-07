@@ -55,6 +55,28 @@
             <Setter Property="FontSize" Value="18" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
+
+        <Style x:Key="SettingsButtonStyle" TargetType="Button" BasedOn="{StaticResource PlaceholderButtonStyle}">
+            <Setter Property="MinWidth" Value="142" />
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="Margin" Value="10,0" />
+            <Setter Property="Background" Value="#AA061521" />
+            <Setter Property="BorderBrush" Value="#8CE8FF" />
+            <Setter Property="Foreground" Value="#EAFBFF" />
+        </Style>
+
+        <Style x:Key="SettingsInputStyle" TargetType="TextBox">
+            <Setter Property="Width" Value="250" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Padding" Value="12,5" />
+            <Setter Property="Background" Value="#BF071523" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#DFFBFF" />
+            <Setter Property="CaretBrush" Value="#DFFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
+            <Setter Property="FontSize" Value="22" />
+        </Style>
     </Window.Resources>
 
     <Grid Background="Black">
@@ -179,6 +201,105 @@
                             Style="{StaticResource PlaceholderButtonStyle}" />
                 </StackPanel>
             </Grid>
+        </Grid>
+
+        <Grid x:Name="SettingsView" Visibility="Collapsed">
+            <Viewbox Stretch="UniformToFill"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Stretch">
+                <Grid Width="1672"
+                      Height="941">
+                    <Image Source="pack://application:,,,/Assets/engine.png"
+                           Stretch="Fill" />
+
+                    <Grid Margin="270,205,570,240"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          IsHitTestVisible="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="ENGINE SETTINGS"
+                                   Style="{StaticResource SectionHeaderTextStyle}"
+                                   FontSize="34"
+                                   Foreground="#D8F8FF"
+                                   Opacity="0.92" />
+
+                        <Grid Grid.Row="1"
+                              Margin="0,42,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="360" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="SPLASH DURATION SECONDS"
+                                       Style="{StaticResource SectionHeaderTextStyle}"
+                                       FontSize="24"
+                                       Foreground="#9FEFFF"
+                                       VerticalAlignment="Center" />
+                            <TextBox x:Name="SplashDurationTextBox"
+                                     Grid.Column="1"
+                                     Style="{StaticResource SettingsInputStyle}"
+                                     TextChanged="OnSettingsValueChanged"
+                                     AutomationProperties.Name="Splash Duration Seconds" />
+
+                            <TextBlock Grid.Row="2"
+                                       Text="APPLICATION VERSION"
+                                       Style="{StaticResource SectionHeaderTextStyle}"
+                                       FontSize="24"
+                                       Foreground="#9FEFFF"
+                                       VerticalAlignment="Center" />
+                            <TextBox x:Name="ApplicationVersionTextBox"
+                                     Grid.Row="2"
+                                     Grid.Column="1"
+                                     Style="{StaticResource SettingsInputStyle}"
+                                     TextChanged="OnSettingsValueChanged"
+                                     AutomationProperties.Name="Application Version" />
+                        </Grid>
+
+                        <TextBlock x:Name="SettingsValidationMessage"
+                                   Grid.Row="2"
+                                   Margin="0,30,0,0"
+                                   Style="{StaticResource BodyTextStyle}"
+                                   FontSize="20"
+                                   Foreground="#FFB36A"
+                                   TextWrapping="Wrap" />
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom"
+                                Margin="0,0,0,68">
+                        <Button x:Name="SettingsSaveButton"
+                                Content="Save"
+                                Click="OnSaveSettings"
+                                Visibility="Collapsed"
+                                AutomationProperties.Name="Save"
+                                Style="{StaticResource SettingsButtonStyle}" />
+                        <Button x:Name="SettingsCancelButton"
+                                Content="Cancel"
+                                Click="OnCancelSettings"
+                                Visibility="Collapsed"
+                                AutomationProperties.Name="Cancel"
+                                Style="{StaticResource SettingsButtonStyle}" />
+                        <Button x:Name="SettingsCloseButton"
+                                Content="Close"
+                                Click="OnCloseSettings"
+                                Visibility="Visible"
+                                AutomationProperties.Name="Close"
+                                Style="{StaticResource SettingsButtonStyle}" />
+                    </StackPanel>
+                </Grid>
+            </Viewbox>
         </Grid>
     </Grid>
 </Window>

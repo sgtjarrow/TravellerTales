@@ -18,6 +18,7 @@
     </None>
     <Resource Include="Assets\captains_guild.png" />
     <Resource Include="Assets\landing.png" />
+    <Resource Include="Assets\engine.png" />
     <Resource Include="Assets\icon.ico" />
     <Resource Include="Assets\Fonts\*.ttf" />
   </ItemGroup>
