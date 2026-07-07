@@ -13,13 +13,14 @@
         Icon="pack://application:,,,/Assets/icon.ico"
         Background="Black"
         Foreground="{StaticResource AppForegroundBrush}"
-        FontFamily="Segoe UI">
+        FontFamily="{StaticResource BodyTextFontFamily}">
     <Window.Resources>
         <Style x:Key="LandingPolygonButtonStyle" TargetType="{x:Type controls:PolygonButton}">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Foreground" Value="Transparent" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="HoverFill" Value="#2237AFFF" />
             <Setter Property="HoverStroke" Value="#887EDBFF" />
@@ -64,6 +65,22 @@
                       IsHitTestVisible="True">
                     <Image Source="pack://application:,,,/Assets/landing.png"
                            Stretch="Fill" />
+
+                    <StackPanel Margin="44,36,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                IsHitTestVisible="False"
+                                Opacity="0.82">
+                        <TextBlock Text="Traveller Tales"
+                                   Style="{StaticResource AppTitleTextStyle}"
+                                   FontSize="46"
+                                   Foreground="#D8F1FF" />
+                        <TextBlock Text="{Binding VersionText}"
+                                   Style="{StaticResource DataFieldTextStyle}"
+                                   FontSize="17"
+                                   Foreground="#9FCFFF"
+                                   Margin="4,2,0,0" />
+                    </StackPanel>
 
                     <controls:PolygonButton x:Name="ContinueButton"
                                             Width="1672"
@@ -140,11 +157,13 @@
 
                 <TextBlock x:Name="PlaceholderTitle"
                            Text="Placeholder"
+                           Style="{StaticResource SectionHeaderTextStyle}"
                            FontSize="54"
                            FontWeight="SemiBold"
                            Foreground="#EAF6FF" />
                 <TextBlock x:Name="PlaceholderBody"
                            Grid.Row="1"
+                           Style="{StaticResource BodyTextStyle}"
                            Margin="0,22,0,34"
                            TextWrapping="Wrap"
                            FontSize="24"

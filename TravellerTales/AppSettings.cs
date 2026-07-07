@@ -6,6 +6,7 @@ namespace TravellerTales;
 public sealed class AppSettings
 {
     public int SplashDurationSeconds { get; init; } = 3;
+    public string ApplicationVersion { get; init; } = "0.1.0";
     public DataSettings Data { get; init; } = new();
 
     public static AppSettings Load()

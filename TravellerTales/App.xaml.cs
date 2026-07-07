@@ -16,7 +16,7 @@ public partial class App : Application
         var delaySeconds = Math.Max(0, settings.SplashDurationSeconds);
         await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
 
-        var mainWindow = new MainWindow();
+        var mainWindow = new MainWindow(settings);
         MainWindow = mainWindow;
         mainWindow.Show();
         splashWindow.Close();

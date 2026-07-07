@@ -4,8 +4,12 @@ namespace TravellerTales;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public string VersionText { get; }
+
+    public MainWindow(AppSettings settings)
     {
+        VersionText = $"Version {settings.ApplicationVersion}";
+        DataContext = this;
         InitializeComponent();
     }
 

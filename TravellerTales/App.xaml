@@ -6,6 +6,33 @@
         <SolidColorBrush x:Key="AppBackgroundBrush" Color="#050505" />
         <SolidColorBrush x:Key="AppForegroundBrush" Color="#F6F2EA" />
         <SolidColorBrush x:Key="AppAccentBrush" Color="#C99A45" />
+        <FontFamily x:Key="AppTitleFontFamily">Orbitron, Bahnschrift SemiBold, Segoe UI Semibold</FontFamily>
+        <FontFamily x:Key="SectionHeaderFontFamily">Rajdhani, Bahnschrift SemiBold, Segoe UI Semibold</FontFamily>
+        <FontFamily x:Key="LabelButtonFontFamily">Rajdhani, Bahnschrift, Segoe UI</FontFamily>
+        <FontFamily x:Key="BodyTextFontFamily">Exo 2, Segoe UI</FontFamily>
+        <FontFamily x:Key="DataFieldFontFamily">Share Tech Mono, Consolas</FontFamily>
+
+        <Style x:Key="AppTitleTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource AppTitleFontFamily}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource AppForegroundBrush}" />
+        </Style>
+
+        <Style x:Key="SectionHeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource SectionHeaderFontFamily}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource AppForegroundBrush}" />
+        </Style>
+
+        <Style x:Key="BodyTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource BodyTextFontFamily}" />
+            <Setter Property="Foreground" Value="{StaticResource AppForegroundBrush}" />
+        </Style>
+
+        <Style x:Key="DataFieldTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
+            <Setter Property="Foreground" Value="{StaticResource AppForegroundBrush}" />
+        </Style>
 
         <Style x:Key="LandingButtonStyle" TargetType="Button">
             <Setter Property="MinHeight" Value="58" />
@@ -16,6 +43,7 @@
             <Setter Property="BorderBrush" Value="#4A3D2F" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="{StaticResource AppForegroundBrush}" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
