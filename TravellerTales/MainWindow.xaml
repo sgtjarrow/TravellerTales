@@ -9,6 +9,7 @@
         MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
+        Icon="Assets/icon.ico"
         Background="{StaticResource AppBackgroundBrush}"
         Foreground="{StaticResource AppForegroundBrush}"
         FontFamily="Segoe UI">
