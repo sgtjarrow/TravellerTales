@@ -6,7 +6,7 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Icon="Assets/icon.ico"
+        Icon="pack://application:,,,/Assets/icon.ico"
         Background="Black"
         ShowInTaskbar="False"
         FontFamily="Segoe UI">
