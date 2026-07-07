@@ -74,7 +74,7 @@
                                             ToolTipService.ShowOnDisabled="True"
                                             ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
-                                            ShapeData="M 696,399 L 970,399 L 970,439 L 696,439 Z"
+                                            ShapeData="M 696,379 L 970,379 L 970,419 L 696,419 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -83,7 +83,7 @@
                                             ToolTip="New Character"
                                             ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
-                                            ShapeData="M 696,445 L 970,445 L 970,483 L 696,483 Z"
+                                            ShapeData="M 696,425 L 970,425 L 970,463 L 696,463 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -92,7 +92,7 @@
                                             ToolTip="Edit Narratives"
                                             ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
-                                            ShapeData="M 696,490 L 970,490 L 970,529 L 696,529 Z"
+                                            ShapeData="M 696,470 L 970,470 L 970,509 L 696,509 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -101,7 +101,7 @@
                                             ToolTip="Settings"
                                             ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
-                                            ShapeData="M 696,535 L 970,535 L 970,574 L 696,574 Z"
+                                            ShapeData="M 696,515 L 970,515 L 970,554 L 696,554 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -110,7 +110,7 @@
                                             ToolTip="Credits"
                                             ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
-                                            ShapeData="M 696,580 L 970,580 L 970,619 L 696,619 Z"
+                                            ShapeData="M 696,560 L 970,560 L 970,599 L 696,599 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
@@ -119,7 +119,7 @@
                                             ToolTip="Exit"
                                             ShapeFill="Transparent"
                                             ShapeStroke="Transparent"
-                                            ShapeData="M 696,625 L 970,625 L 970,664 L 696,664 Z"
+                                            ShapeData="M 696,605 L 970,605 L 970,644 L 696,644 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                 </Grid>
             </Viewbox>
