@@ -68,7 +68,8 @@
         <Style x:Key="SettingsInputStyle" TargetType="TextBox">
             <Setter Property="Width" Value="250" />
             <Setter Property="Height" Value="44" />
-            <Setter Property="Padding" Value="12,5" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Background" Value="#BF071523" />
             <Setter Property="BorderBrush" Value="#5FD9FF" />
             <Setter Property="BorderThickness" Value="1" />
