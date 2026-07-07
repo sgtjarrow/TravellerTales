@@ -11,7 +11,7 @@
         ShowInTaskbar="False"
         FontFamily="Segoe UI">
     <Grid Background="Black">
-        <Image Source="Assets/captains_guild.png"
+        <Image Source="pack://application:,,,/Assets/captains_guild.png"
                Stretch="UniformToFill"
                HorizontalAlignment="Center"
                VerticalAlignment="Center" />
