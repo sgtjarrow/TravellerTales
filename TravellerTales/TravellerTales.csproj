@@ -13,7 +13,7 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Resource Update="Assets\captains_guild.png" />
+    <Resource Include="Assets\captains_guild.png" />
     <Resource Include="Assets\icon.ico" />
   </ItemGroup>
 
