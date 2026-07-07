@@ -24,6 +24,8 @@
             <Setter Property="HoverFill" Value="#224AA3FF" />
             <Setter Property="HoverStroke" Value="#CC7EC7FF" />
             <Setter Property="PressedFill" Value="#334AA3FF" />
+            <Setter Property="ShapeFill" Value="#55FF3B30" />
+            <Setter Property="ShapeStroke" Value="#E6FF3B30" />
             <Setter Property="StrokeThickness" Value="2" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -70,20 +72,26 @@
                                             AutomationProperties.Name="Continue"
                                             ToolTip="Continue will be available when an in-progress character exists."
                                             ToolTipService.ShowOnDisabled="True"
-                                            ShapeData="M 1249,135 L 1592,135 L 1609,153 L 1601,185 L 1576,205 L 1243,215 L 1223,194 L 1227,157 Z"
+                                            ShapeFill="#55FF3B30"
+                                            ShapeStroke="#E6FF3B30"
+                                            ShapeData="M 1248,135 L 1592,135 L 1608,153 L 1601,185 L 1575,207 L 1243,215 L 1223,194 L 1227,158 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
                                             Click="OnNewCharacter"
                                             AutomationProperties.Name="New Character"
                                             ToolTip="New Character"
-                                            ShapeData="M 1242,223 L 1586,226 L 1604,246 L 1596,276 L 1571,295 L 1235,304 L 1214,283 L 1218,246 Z"
+                                            ShapeFill="#5500C853"
+                                            ShapeStroke="#E600C853"
+                                            ShapeData="M 1242,223 L 1586,226 L 1604,246 L 1596,276 L 1571,295 L 1235,304 L 1214,283 L 1218,247 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
                                             Click="OnEditNarratives"
                                             AutomationProperties.Name="Edit Narratives"
                                             ToolTip="Edit Narratives"
+                                            ShapeFill="#552978FF"
+                                            ShapeStroke="#E62978FF"
                                             ShapeData="M 1236,313 L 1579,316 L 1596,337 L 1588,367 L 1563,386 L 1228,394 L 1207,373 L 1211,335 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
@@ -91,21 +99,27 @@
                                             Click="OnSettings"
                                             AutomationProperties.Name="Settings"
                                             ToolTip="Settings"
-                                            ShapeData="M 1229,402 L 1572,407 L 1589,427 L 1581,458 L 1556,477 L 1221,484 L 1200,462 L 1204,424 Z"
+                                            ShapeFill="#55FFD600"
+                                            ShapeStroke="#E6FFD600"
+                                            ShapeData="M 1227,400 L 1572,406 L 1589,427 L 1581,458 L 1556,477 L 1221,484 L 1199,462 L 1204,425 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
                                             Click="OnCredits"
                                             AutomationProperties.Name="Credits"
                                             ToolTip="Credits"
-                                            ShapeData="M 1221,490 L 1565,496 L 1582,516 L 1574,548 L 1549,566 L 1214,572 L 1193,551 L 1197,512 Z"
+                                            ShapeFill="#55D500F9"
+                                            ShapeStroke="#E6D500F9"
+                                            ShapeData="M 1220,489 L 1565,496 L 1582,516 L 1574,548 L 1549,566 L 1214,572 L 1192,551 L 1197,513 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                     <controls:PolygonButton Width="1672"
                                             Height="941"
                                             Click="OnExit"
                                             AutomationProperties.Name="Exit"
                                             ToolTip="Exit"
-                                            ShapeData="M 1213,578 L 1557,586 L 1575,607 L 1567,639 L 1542,657 L 1206,662 L 1186,640 L 1190,601 Z"
+                                            ShapeFill="#55FF6D00"
+                                            ShapeStroke="#E6FF6D00"
+                                            ShapeData="M 1212,578 L 1557,586 L 1575,607 L 1567,639 L 1542,657 L 1206,662 L 1185,640 L 1190,602 Z"
                                             Style="{StaticResource LandingPolygonButtonStyle}" />
                 </Grid>
             </Viewbox>
