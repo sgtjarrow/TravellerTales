@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace TravellerTales.Controls;
@@ -62,6 +63,11 @@ public sealed class PolygonButton : Button
             new FrameworkPropertyMetadata(typeof(PolygonButton)));
     }
 
+    public PolygonButton()
+    {
+        IsEnabledChanged += (_, _) => InvalidateVisual();
+    }
+
     public Geometry? ShapeData
     {
         get => (Geometry?)GetValue(ShapeDataProperty);
@@ -122,7 +128,7 @@ public sealed class PolygonButton : Button
         base.OnRender(drawingContext);
 
         var shape = ShapeData;
-        if (shape is null)
+        if (shape is null || !IsEnabled)
         {
             return;
         }
@@ -132,4 +138,41 @@ public sealed class PolygonButton : Button
         var pen = new Pen(stroke, StrokeThickness);
         drawingContext.DrawGeometry(fill, pen, shape);
     }
+
+    protected override void OnMouseEnter(MouseEventArgs e)
+    {
+        base.OnMouseEnter(e);
+        InvalidateVisual();
+    }
+
+    protected override void OnMouseLeave(MouseEventArgs e)
+    {
+        base.OnMouseLeave(e);
+        InvalidateVisual();
+    }
+
+    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+    {
+        base.OnMouseLeftButtonDown(e);
+        InvalidateVisual();
+    }
+
+    protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseLeftButtonUp(e);
+        InvalidateVisual();
+    }
+
+    protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
+    {
+        base.OnGotKeyboardFocus(e);
+        InvalidateVisual();
+    }
+
+    protected override void OnLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
+    {
+        base.OnLostKeyboardFocus(e);
+        InvalidateVisual();
+    }
+
 }
