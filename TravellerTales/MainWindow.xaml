@@ -1,0 +1,85 @@
+<Window x:Class="TravellerTales.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Traveller Tales"
+        MinHeight="720"
+        MinWidth="1100"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="{StaticResource AppBackgroundBrush}"
+        Foreground="{StaticResource AppForegroundBrush}"
+        FontFamily="Segoe UI">
+    <Grid Background="{StaticResource AppBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid MaxWidth="1680"
+              Margin="72,64"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="520" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Traveller Tales"
+                           FontSize="72"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource AppForegroundBrush}" />
+                <TextBlock Margin="0,20,0,0"
+                           MaxWidth="860"
+                           Text="Create characters and preserve the narrative details that shape their journeys."
+                           TextWrapping="Wrap"
+                           FontSize="28"
+                           LineHeight="38"
+                           Foreground="#D8D2C8" />
+            </StackPanel>
+
+            <Border Grid.Column="1"
+                    Padding="36"
+                    Background="#101010"
+                    BorderBrush="#383028"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Character Files"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource AppForegroundBrush}" />
+                    <TextBlock Margin="0,8,0,28"
+                               Text="{Binding DataLocationText}"
+                               TextWrapping="Wrap"
+                               FontSize="15"
+                               Foreground="#BBB4AA" />
+
+                    <Button Content="New Character"
+                            Click="OnPlaceholderAction"
+                            Style="{StaticResource LandingButtonStyle}" />
+                    <Button Content="Open Character"
+                            Click="OnPlaceholderAction"
+                            Style="{StaticResource LandingButtonStyle}" />
+                    <Button Content="Import JSON"
+                            Click="OnPlaceholderAction"
+                            Style="{StaticResource LandingButtonStyle}" />
+                    <Button Content="Export JSON"
+                            Click="OnPlaceholderAction"
+                            Style="{StaticResource LandingButtonStyle}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <TextBlock Grid.Row="1"
+                   Margin="32"
+                   HorizontalAlignment="Right"
+                   Text="Local JSON storage. No online resources required."
+                   FontSize="16"
+                   Foreground="#8F877C" />
+    </Grid>
+</Window>
