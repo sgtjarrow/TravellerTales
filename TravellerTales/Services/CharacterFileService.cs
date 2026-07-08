@@ -13,7 +13,14 @@ public static class CharacterFileService
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
-        Converters = { new JsonStringEnumConverter() }
+        Converters =
+        {
+            new EyeColorTypeJsonConverter(),
+            new NullableEnumJsonConverter<HairColorType>(),
+            new NullableEnumJsonConverter<FurPatternType>(),
+            new NullableEnumJsonConverter<FurColorType>(),
+            new JsonStringEnumConverter()
+        }
     };
 
     public static string PausedCreationPath => Path.Combine(AppPaths.CharactersDirectory, PausedCreationFileName);
@@ -73,5 +80,74 @@ public static class CharacterFileService
     {
         var sanitizedName = SanitizeCharacterName(name);
         return !string.IsNullOrWhiteSpace(sanitizedName) && File.Exists(GetFinalCharacterPath(name));
+    }
+}
+
+public sealed class EyeColorTypeJsonConverter : JsonConverter<EyeColorType>
+{
+    public override EyeColorType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var value = reader.GetString();
+            return Enum.TryParse<EyeColorType>(value, ignoreCase: true, out var eyeColor)
+                ? eyeColor
+                : EyeColorType.Brown;
+        }
+
+        if (reader.TokenType == JsonTokenType.Number &&
+            reader.TryGetInt32(out var numericValue) &&
+            Enum.IsDefined(typeof(EyeColorType), numericValue))
+        {
+            return (EyeColorType)numericValue;
+        }
+
+        return EyeColorType.Brown;
+    }
+
+    public override void Write(Utf8JsonWriter writer, EyeColorType value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public sealed class NullableEnumJsonConverter<TEnum> : JsonConverter<TEnum?>
+    where TEnum : struct, Enum
+{
+    public override TEnum? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return null;
+        }
+
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var value = reader.GetString();
+            return Enum.TryParse<TEnum>(value, ignoreCase: true, out var enumValue)
+                ? enumValue
+                : null;
+        }
+
+        if (reader.TokenType == JsonTokenType.Number &&
+            reader.TryGetInt32(out var numericValue) &&
+            Enum.IsDefined(typeof(TEnum), numericValue))
+        {
+            return (TEnum)Enum.ToObject(typeof(TEnum), numericValue);
+        }
+
+        return null;
+    }
+
+    public override void Write(Utf8JsonWriter writer, TEnum? value, JsonSerializerOptions options)
+    {
+        if (value.HasValue)
+        {
+            writer.WriteStringValue(value.Value.ToString());
+        }
+        else
+        {
+            writer.WriteNullValue();
+        }
     }
 }

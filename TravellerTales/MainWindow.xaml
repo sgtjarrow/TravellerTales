@@ -324,6 +324,7 @@
               Visibility="Collapsed">
             <views:NewCharacterWizardControl x:Name="NewCharacterWizard"
                                              SaveRequested="OnSaveCharacterCreation"
+                                             CheckpointSaveRequested="OnCheckpointSaveCharacterCreation"
                                              CancelRequested="OnCancelCharacterCreation" />
         </Grid>
 

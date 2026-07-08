@@ -2,12 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:TravellerTales.Controls"
+             xmlns:views="clr-namespace:TravellerTales.Views"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              d:DesignHeight="650"
              d:DesignWidth="1240">
     <UserControl.Resources>
+        <views:EnumDisplayConverter x:Key="EnumDisplayConverter" />
+
         <Style x:Key="WizardLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource SectionHeaderTextStyle}">
             <Setter Property="FontSize" Value="19" />
             <Setter Property="Foreground" Value="#9FEFFF" />
@@ -35,8 +38,16 @@
             <Setter Property="BorderBrush" Value="#5FD9FF" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="#EAFBFF" />
+            <Setter Property="Opacity" Value="1" />
             <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
             <Setter Property="FontSize" Value="20" />
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDisplayConverter}}" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
@@ -59,7 +70,8 @@
                                                       HorizontalAlignment="Left"
                                                       VerticalAlignment="Center" />
 
-                                    <ToggleButton Grid.Column="1"
+                                    <ToggleButton x:Name="DropdownToggle"
+                                                  Grid.Column="1"
                                                   IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                                   Background="Transparent"
                                                   BorderBrush="Transparent"
@@ -68,7 +80,19 @@
                                                   FontFamily="{StaticResource LabelButtonFontFamily}"
                                                   FontSize="16"
                                                   Content="v"
-                                                  Cursor="Hand" />
+                                                  Cursor="Hand">
+                                        <ToggleButton.Template>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"
+                                                                      TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </ToggleButton.Template>
+                                    </ToggleButton>
                                 </Grid>
                             </Border>
 
@@ -88,6 +112,15 @@
                                 </Border>
                             </Popup>
                         </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ComboBorder" Property="Background" Value="#B0061521" />
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="#3D8EAA" />
+                                <Setter TargetName="DropdownToggle" Property="Foreground" Value="#6FB9CA" />
+                                <Setter TargetName="DropdownToggle" Property="Background" Value="#400D3144" />
+                                <Setter Property="Foreground" Value="#BFEAF2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -116,19 +149,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="BIOGRAPHY"
-                   Style="{StaticResource AppTitleTextStyle}"
-                   FontSize="42"
-                   Foreground="#D8F8FF"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,18" />
-
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0"
+              Margin="0,0,0,-74">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.2*" />
                 <ColumnDefinition Width="34" />
@@ -139,7 +165,9 @@
                     BorderBrush="#5FD9FF"
                     BorderThickness="1"
                     Padding="26">
-                <Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                <Grid Margin="0,0,14,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="185" />
                         <ColumnDefinition Width="*" />
@@ -187,7 +215,7 @@
                               Grid.Row="4"
                               Grid.Column="1"
                               Style="{StaticResource WizardComboBoxStyle}"
-                              SelectionChanged="OnFieldChanged" />
+                              SelectionChanged="OnGenderChanged" />
 
                     <TextBlock Grid.Row="6"
                                Text="AGE"
@@ -200,57 +228,75 @@
                              Style="{StaticResource WizardTextBoxStyle}" />
 
                     <TextBlock Grid.Row="8"
-                               Text="HEIGHT (INCHES)"
+                               Text="HEIGHT"
                                Style="{StaticResource WizardLabelStyle}" />
                     <Grid Grid.Row="8"
                           Grid.Column="1">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="95" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="150" />
                             <ColumnDefinition Width="28" />
                             <ColumnDefinition Width="150" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <controls:NumericStepper x:Name="HeightStepper"
-                                                  Minimum="1"
-                                                  ValueChanged="OnFieldChanged" />
-                        <TextBlock Grid.Column="2"
+                        <TextBlock Text="INCHES"
+                                   Style="{StaticResource WizardLabelStyle}" />
+                        <Border x:Name="HeightStepperBorder"
+                                Grid.Column="2"
+                                BorderBrush="#5FD9FF"
+                                BorderThickness="2">
+                            <controls:NumericStepper x:Name="HeightStepper"
+                                                      Minimum="1"
+                                                      ValueChanged="OnFieldChanged" />
+                        </Border>
+                        <TextBlock Grid.Column="4"
                                    Text="METERS"
                                    Style="{StaticResource WizardLabelStyle}" />
                         <TextBlock x:Name="HeightMetersText"
-                                   Grid.Column="3"
+                                   Grid.Column="5"
                                    Style="{StaticResource MetricValueStyle}" />
                     </Grid>
 
                     <TextBlock Grid.Row="10"
-                               Text="WEIGHT (POUNDS)"
+                               Text="WEIGHT"
                                Style="{StaticResource WizardLabelStyle}" />
                     <Grid Grid.Row="10"
                           Grid.Column="1">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="95" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="150" />
                             <ColumnDefinition Width="28" />
                             <ColumnDefinition Width="150" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <controls:NumericStepper x:Name="WeightStepper"
-                                                  Minimum="1"
-                                                  ValueChanged="OnFieldChanged" />
-                        <TextBlock Grid.Column="2"
+                        <TextBlock Text="POUNDS"
+                                   Style="{StaticResource WizardLabelStyle}" />
+                        <Border x:Name="WeightStepperBorder"
+                                Grid.Column="2"
+                                BorderBrush="#5FD9FF"
+                                BorderThickness="2">
+                            <controls:NumericStepper x:Name="WeightStepper"
+                                                      Minimum="1"
+                                                      ValueChanged="OnFieldChanged" />
+                        </Border>
+                        <TextBlock Grid.Column="4"
                                    Text="KILOGRAMS"
                                    Style="{StaticResource WizardLabelStyle}" />
                         <TextBlock x:Name="WeightKilogramsText"
-                                   Grid.Column="3"
+                                   Grid.Column="5"
                                    Style="{StaticResource MetricValueStyle}" />
                     </Grid>
 
                     <TextBlock Grid.Row="12"
                                Text="EYE COLOR"
                                Style="{StaticResource WizardLabelStyle}" />
-                    <TextBox x:Name="EyeColorTextBox"
-                             Grid.Row="12"
-                             Grid.Column="1"
-                             Style="{StaticResource WizardTextBoxStyle}"
-                             TextChanged="OnFieldChanged" />
+                    <ComboBox x:Name="EyeColorComboBox"
+                              Grid.Row="12"
+                              Grid.Column="1"
+                              Style="{StaticResource WizardComboBoxStyle}"
+                              SelectionChanged="OnFieldChanged" />
 
                     <TextBlock Grid.Row="14"
                                Text="DESCRIPTION"
@@ -286,22 +332,31 @@
                              Style="{StaticResource WizardTextBoxStyle}"
                              TextChanged="OnFieldChanged" />
                 </Grid>
+                </ScrollViewer>
             </Border>
 
-            <Grid Grid.Column="2">
+            <Grid Grid.Column="2"
+                  Margin="0,0,0,74">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="18" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
                 <Border x:Name="HumanDetailsCard"
                         Background="#D006111E"
-                        BorderBrush="#C99A45"
+                        BorderBrush="#5FD9FF"
                         BorderThickness="1"
-                        Padding="28">
+                        Padding="22">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="34" />
+                            <RowDefinition Height="24" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="18" />
+                            <RowDefinition Height="14" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
+                            <RowDefinition Height="14" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="165" />
@@ -316,41 +371,50 @@
                                    HorizontalAlignment="Center" />
 
                         <TextBlock Grid.Row="2"
+                                   Text="SKIN COLOR"
+                                   Style="{StaticResource WizardLabelStyle}" />
+                        <ComboBox x:Name="SkinColorComboBox"
+                                  Grid.Row="2"
+                                  Grid.Column="1"
+                                  Style="{StaticResource WizardComboBoxStyle}"
+                                  SelectionChanged="OnSkinColorChanged" />
+
+                        <TextBlock Grid.Row="4"
                                    Text="HERITAGE"
                                    Style="{StaticResource WizardLabelStyle}" />
                         <ComboBox x:Name="HeritageComboBox"
-                                  Grid.Row="2"
+                                  Grid.Row="4"
                                   Grid.Column="1"
                                   Style="{StaticResource WizardComboBoxStyle}"
                                   SelectionChanged="OnFieldChanged" />
 
-                        <TextBlock Grid.Row="4"
+                        <TextBlock Grid.Row="6"
                                    Text="HAIR COLOR"
                                    Style="{StaticResource WizardLabelStyle}" />
-                        <TextBox x:Name="HairColorTextBox"
-                                 Grid.Row="4"
-                                 Grid.Column="1"
-                                 Style="{StaticResource WizardTextBoxStyle}"
-                                 TextChanged="OnFieldChanged" />
+                        <ComboBox x:Name="HairColorComboBox"
+                                  Grid.Row="6"
+                                  Grid.Column="1"
+                                  Style="{StaticResource WizardComboBoxStyle}"
+                                  SelectionChanged="OnFieldChanged" />
                     </Grid>
                 </Border>
 
                 <Border x:Name="NonHumanDetailsCard"
+                        Grid.Row="0"
                         Visibility="Collapsed"
                         Background="#D006111E"
-                        BorderBrush="#C99A45"
+                        BorderBrush="#5FD9FF"
                         BorderThickness="1"
-                        Padding="28">
+                        Padding="22">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="34" />
+                            <RowDefinition Height="24" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="18" />
+                            <RowDefinition Height="14" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="18" />
+                            <RowDefinition Height="14" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="175" />
@@ -367,36 +431,44 @@
                         <TextBlock Grid.Row="2"
                                    Text="FUR PATTERN"
                                    Style="{StaticResource WizardLabelStyle}" />
-                        <TextBox x:Name="FurPatternTextBox"
-                                 Grid.Row="2"
-                                 Grid.Column="1"
-                                 Style="{StaticResource WizardTextBoxStyle}"
-                                 TextChanged="OnFieldChanged" />
+                        <ComboBox x:Name="FurPatternComboBox"
+                                  Grid.Row="2"
+                                  Grid.Column="1"
+                                  Style="{StaticResource WizardComboBoxStyle}"
+                                  SelectionChanged="OnFurPatternChanged" />
 
                         <TextBlock Grid.Row="4"
                                    Text="FUR PRIMARY"
                                    Style="{StaticResource WizardLabelStyle}" />
-                        <TextBox x:Name="FurPrimaryColorTextBox"
-                                 Grid.Row="4"
-                                 Grid.Column="1"
-                                 Style="{StaticResource WizardTextBoxStyle}"
-                                 TextChanged="OnFieldChanged" />
+                        <ComboBox x:Name="FurPrimaryColorComboBox"
+                                  Grid.Row="4"
+                                  Grid.Column="1"
+                                  Style="{StaticResource WizardComboBoxStyle}"
+                                  SelectionChanged="OnFieldChanged" />
 
                         <TextBlock Grid.Row="6"
                                    Text="FUR SECONDARY"
                                    Style="{StaticResource WizardLabelStyle}" />
-                        <TextBox x:Name="FurSecondaryColorTextBox"
-                                 Grid.Row="6"
-                                 Grid.Column="1"
-                                 Style="{StaticResource WizardTextBoxStyle}"
-                                 TextChanged="OnFieldChanged" />
+                        <ComboBox x:Name="FurSecondaryColorComboBox"
+                                  Grid.Row="6"
+                                  Grid.Column="1"
+                                  Style="{StaticResource WizardComboBoxStyle}"
+                                  SelectionChanged="OnFieldChanged" />
                     </Grid>
+                </Border>
+
+                <Border Grid.Row="2"
+                        Background="#D006111E"
+                        BorderBrush="#5FD9FF"
+                        BorderThickness="1">
+                    <Image x:Name="CharacterPortraitImage"
+                           Stretch="Uniform" />
                 </Border>
             </Grid>
         </Grid>
 
         <TextBlock x:Name="ValidationMessage"
-                   Grid.Row="2"
+                   Grid.Row="1"
                    Margin="0,18,0,0"
                    Style="{StaticResource BodyTextStyle}"
                    FontSize="20"

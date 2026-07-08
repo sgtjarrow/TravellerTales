@@ -11,11 +11,12 @@ public sealed class Character
     public int WeightPounds { get; set; }
     public double HeightMeters => HeightInches * 0.0254;
     public double WeightKilograms => WeightPounds * 0.45359237;
-    public string EyeColor { get; set; } = string.Empty;
-    public string? HairColor { get; set; }
-    public string? FurPattern { get; set; }
-    public string? FurPrimaryColor { get; set; }
-    public string? FurSecondaryColor { get; set; }
+    public EyeColorType EyeColor { get; set; } = EyeColorType.Brown;
+    public SkinColorType SkinColor { get; set; } = SkinColorType.Tan;
+    public HairColorType? HairColor { get; set; } = HairColorType.Brown;
+    public FurPatternType? FurPattern { get; set; }
+    public FurColorType? FurPrimaryColor { get; set; }
+    public FurColorType? FurSecondaryColor { get; set; }
     public string Description { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public CharacterCreationMetadata CreationMetadata { get; set; } = new();
@@ -64,4 +65,100 @@ public enum GenderType
 {
     Male,
     Female
+}
+
+public enum EyeColorType
+{
+    Amber,
+    Black,
+    Blue,
+    Brown,
+    Cyan,
+    Emerald,
+    Gold,
+    Gray,
+    Green,
+    Hazel,
+    Heterochromatic,
+    NeonBlue,
+    Red,
+    Silver,
+    Violet
+}
+
+public enum SkinColorType
+{
+    Black,
+    BlueTint,
+    Bronze,
+    Brown,
+    Chrome,
+    Copper,
+    DarkBrown,
+    Ebony,
+    EmeraldTint,
+    Fair,
+    Golden,
+    Lavender,
+    LightBrown,
+    MediumBrown,
+    Olive,
+    Pale,
+    Porcelain,
+    Silver,
+    Tan,
+    Umber,
+    Albino
+}
+
+public enum HairColorType
+{
+    Auburn,
+    Black,
+    Blonde,
+    Brown,
+    Chestnut,
+    Copper,
+    DarkBrown,
+    Gray,
+    Red,
+    Silver,
+    White
+}
+
+public enum FurColorType
+{
+    Black,
+    Brown,
+    Cream,
+    DarkBrown,
+    DarkGray,
+    Golden,
+    Gray,
+    LightBrown,
+    RedBrown,
+    Sandy,
+    Silver,
+    Tan,
+    Tawny,
+    White
+}
+
+public enum FurPatternType
+{
+    Agouti,
+    Blanket,
+    Brindle,
+    ManeDark,
+    ManeLight,
+    Masked,
+    Merle,
+    Rosetted,
+    Sable,
+    Solid,
+    Spotted,
+    Striped,
+    Tufted,
+    WolfGray,
+    Albino
 }

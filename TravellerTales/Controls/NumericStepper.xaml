@@ -6,6 +6,47 @@
              mc:Ignorable="d"
              d:DesignHeight="42"
              d:DesignWidth="150">
+    <UserControl.Resources>
+        <Style x:Key="StepperButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#D0071523" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#EAFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
+            <Setter Property="FontSize" Value="21" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#E3134560" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#F01C6D95" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#B0061521" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#3D8EAA" />
+                                <Setter Property="Foreground" Value="#6FB9CA" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Grid Width="150"
           Height="42">
         <Grid.ColumnDefinitions>
@@ -14,16 +55,11 @@
             <ColumnDefinition Width="38" />
         </Grid.ColumnDefinitions>
 
-        <Button Grid.Column="0"
+        <Button x:Name="DecreaseButton"
+                Grid.Column="0"
                 Content="-"
                 Click="OnDecrease"
-                Background="#D0071523"
-                BorderBrush="#5FD9FF"
-                BorderThickness="1"
-                Foreground="#EAFBFF"
-                FontFamily="{StaticResource LabelButtonFontFamily}"
-                FontSize="21"
-                Cursor="Hand" />
+                Style="{StaticResource StepperButtonStyle}" />
 
         <TextBox x:Name="ValueTextBox"
                  Grid.Column="1"
@@ -42,15 +78,10 @@
                  PreviewTextInput="OnPreviewTextInput"
                  TextChanged="OnTextChanged" />
 
-        <Button Grid.Column="2"
+        <Button x:Name="IncreaseButton"
+                Grid.Column="2"
                 Content="+"
                 Click="OnIncrease"
-                Background="#D0071523"
-                BorderBrush="#5FD9FF"
-                BorderThickness="1"
-                Foreground="#EAFBFF"
-                FontFamily="{StaticResource LabelButtonFontFamily}"
-                FontSize="21"
-                Cursor="Hand" />
+                Style="{StaticResource StepperButtonStyle}" />
     </Grid>
 </UserControl>

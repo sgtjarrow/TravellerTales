@@ -21,6 +21,36 @@
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="FontSize" Value="18" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#DD0D2A3C" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#C9F5FF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#EE174A64" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#CCB32626" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#7A1E1E" />
+                                <Setter Property="Foreground" Value="#080A0E" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="StepTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource SectionHeaderTextStyle}">
@@ -79,7 +109,7 @@
                     </Grid>
 
                     <UniformGrid Grid.Row="2"
-                                 Columns="4">
+                                 Columns="5">
                         <Border x:Name="BiographyStepIndicator"
                                 Height="62"
                                 Margin="5,0"
@@ -92,6 +122,13 @@
                                 Margin="5,0"
                                 BorderThickness="1">
                             <TextBlock Text="HOMEWORLD"
+                                       Style="{StaticResource StepTitleStyle}" />
+                        </Border>
+                        <Border x:Name="CharacteristicsStepIndicator"
+                                Height="62"
+                                Margin="5,0"
+                                BorderThickness="1">
+                            <TextBlock Text="CHARACTERISTICS"
                                        Style="{StaticResource StepTitleStyle}" />
                         </Border>
                         <Border x:Name="BackgroundSkillsStepIndicator"
@@ -153,6 +190,31 @@
                                            Foreground="#D8F8FF"
                                            HorizontalAlignment="Center" />
                                 <TextBlock Text="This step will assign early life and background skill choices in a later slice."
+                                           Style="{StaticResource BodyTextStyle}"
+                                           FontSize="24"
+                                           LineHeight="34"
+                                           Foreground="#BEDFFF"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           Width="920"
+                                           Margin="0,24,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="CharacteristicsPlaceholder"
+                                Visibility="Collapsed"
+                                Background="#C006111E"
+                                BorderBrush="#5FD9FF"
+                                BorderThickness="1"
+                                Padding="42">
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="CHARACTERISTICS"
+                                           Style="{StaticResource AppTitleTextStyle}"
+                                           FontSize="46"
+                                           Foreground="#D8F8FF"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="This step will define core characteristics in a later slice."
                                            Style="{StaticResource BodyTextStyle}"
                                            FontSize="24"
                                            LineHeight="34"

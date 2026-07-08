@@ -216,6 +216,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ShowLanding();
     }
 
+    private void OnCheckpointSaveCharacterCreation(object sender, TravellerTales.Views.CharacterCreationCheckpointEventArgs e)
+    {
+        try
+        {
+            CharacterFileService.SavePausedCreation(e.State);
+            e.Succeeded = true;
+        }
+        catch (Exception)
+        {
+            e.Succeeded = false;
+            e.ErrorMessage = "The character checkpoint could not be saved. Stay on this step and try again.";
+        }
+    }
+
     private void OnCancelCharacterCreation(object sender, EventArgs e)
     {
         var result = MessageBox.Show(

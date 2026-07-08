@@ -16,7 +16,13 @@ public partial class NumericStepper : UserControl
         nameof(Minimum),
         typeof(int),
         typeof(NumericStepper),
-        new PropertyMetadata(1));
+        new PropertyMetadata(1, OnRangeChanged));
+
+    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(
+        nameof(Maximum),
+        typeof(int),
+        typeof(NumericStepper),
+        new PropertyMetadata(int.MaxValue, OnRangeChanged));
 
     private bool _isUpdatingText;
 
@@ -40,18 +46,33 @@ public partial class NumericStepper : UserControl
         set => SetValue(MinimumProperty, value);
     }
 
+    public int Maximum
+    {
+        get => (int)GetValue(MaximumProperty);
+        set => SetValue(MaximumProperty, value);
+    }
+
     private static object CoerceValue(DependencyObject dependencyObject, object baseValue)
     {
         var control = (NumericStepper)dependencyObject;
         var value = (int)baseValue;
-        return Math.Max(control.Minimum, value);
+        return Math.Clamp(value, control.Minimum, Math.Max(control.Minimum, control.Maximum));
     }
 
     private static void OnValueChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
     {
         var control = (NumericStepper)dependencyObject;
         control.UpdateText();
+        control.UpdateButtonStates();
         control.ValueChanged?.Invoke(control, EventArgs.Empty);
+    }
+
+    private static void OnRangeChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+    {
+        var control = (NumericStepper)dependencyObject;
+        control.CoerceValue(ValueProperty);
+        control.UpdateText();
+        control.UpdateButtonStates();
     }
 
     private void OnDecrease(object sender, RoutedEventArgs e)
@@ -61,7 +82,7 @@ public partial class NumericStepper : UserControl
 
     private void OnIncrease(object sender, RoutedEventArgs e)
     {
-        Value++;
+        Value = Math.Min(Math.Max(Minimum, Maximum), Value + 1);
     }
 
     private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -78,7 +99,7 @@ public partial class NumericStepper : UserControl
 
         if (int.TryParse(ValueTextBox.Text.Trim(), out var value))
         {
-            Value = Math.Max(Minimum, value);
+            Value = Math.Clamp(value, Minimum, Math.Max(Minimum, Maximum));
         }
     }
 
@@ -92,5 +113,16 @@ public partial class NumericStepper : UserControl
         _isUpdatingText = true;
         ValueTextBox.Text = Value.ToString();
         _isUpdatingText = false;
+    }
+
+    private void UpdateButtonStates()
+    {
+        if (!IsInitialized)
+        {
+            return;
+        }
+
+        DecreaseButton.IsEnabled = Value > Minimum;
+        IncreaseButton.IsEnabled = Value < Math.Max(Minimum, Maximum);
     }
 }

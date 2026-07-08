@@ -12,6 +12,7 @@ public partial class NewCharacterWizardControl : UserControl
     [
         "Biography",
         "Homeworld",
+        "Characteristics",
         "Background Skills",
         "Review"
     ];
@@ -19,6 +20,7 @@ public partial class NewCharacterWizardControl : UserControl
     private CharacterCreationState _state = new();
 
     public event EventHandler<CharacterCreationState>? SaveRequested;
+    public event EventHandler<CharacterCreationCheckpointEventArgs>? CheckpointSaveRequested;
     public event EventHandler? CancelRequested;
 
     public NewCharacterWizardControl()
@@ -52,7 +54,15 @@ public partial class NewCharacterWizardControl : UserControl
             return;
         }
 
+        var previousStepIndex = _state.CurrentStepIndex;
         _state.CurrentStepIndex++;
+
+        if (!TrySaveCheckpoint())
+        {
+            _state.CurrentStepIndex = previousStepIndex;
+            return;
+        }
+
         UpdateStep();
     }
 
@@ -83,12 +93,29 @@ public partial class NewCharacterWizardControl : UserControl
         }
     }
 
+    private bool TrySaveCheckpoint()
+    {
+        var checkpointEventArgs = new CharacterCreationCheckpointEventArgs(_state);
+        CheckpointSaveRequested?.Invoke(this, checkpointEventArgs);
+
+        if (checkpointEventArgs.Succeeded)
+        {
+            return true;
+        }
+
+        FooterMessageText.Text = string.IsNullOrWhiteSpace(checkpointEventArgs.ErrorMessage)
+            ? "The character checkpoint could not be saved."
+            : checkpointEventArgs.ErrorMessage;
+        return false;
+    }
+
     private void UpdateStep()
     {
         BiographyStep.Visibility = _state.CurrentStepIndex == 0 ? Visibility.Visible : Visibility.Collapsed;
         HomeworldPlaceholder.Visibility = _state.CurrentStepIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
-        BackgroundSkillsPlaceholder.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
-        ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
+        CharacteristicsPlaceholder.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
+        BackgroundSkillsPlaceholder.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
+        ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
 
         WizardStatusText.Text = $"Step {_state.CurrentStepIndex + 1} of {StepNames.Length}";
         NextButton.Content = _state.CurrentStepIndex == StepNames.Length - 1 ? "Complete" : "Next";
@@ -105,6 +132,7 @@ public partial class NewCharacterWizardControl : UserControl
         {
             BiographyStepIndicator,
             HomeworldStepIndicator,
+            CharacteristicsStepIndicator,
             BackgroundSkillsStepIndicator,
             ReviewStepIndicator
         };
@@ -147,7 +175,7 @@ public partial class NewCharacterWizardControl : UserControl
             $"Age: {ValueOrPending(character.Age)}\n" +
             $"Height: {ValueOrPending(character.HeightInches)} inches / {character.HeightMeters:0.00} meters\n" +
             $"Weight: {ValueOrPending(character.WeightPounds)} pounds / {character.WeightKilograms:0.00} kilograms\n" +
-            $"Eye Color: {ValueOrPending(character.EyeColor)}\n" +
+            $"Eye Color: {character.EyeColor}\n" +
             $"Description: {ValueOrPending(character.Description)}";
 
         var metadata = character.CreationMetadata;
@@ -172,4 +200,16 @@ public partial class NewCharacterWizardControl : UserControl
     {
         return value.ToString("yyyy-MMM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
+}
+
+public sealed class CharacterCreationCheckpointEventArgs : EventArgs
+{
+    public CharacterCreationCheckpointEventArgs(CharacterCreationState state)
+    {
+        State = state;
+    }
+
+    public CharacterCreationState State { get; }
+    public bool Succeeded { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
 }
