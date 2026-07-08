@@ -5,8 +5,8 @@ namespace TravellerTales;
 
 public sealed class AppSettings
 {
-    public int SplashDurationSeconds { get; set; } = 3;
-    public string ApplicationVersion { get; set; } = "0.1.0";
+    public int SplashDurationSeconds { get; set; } = 2;
+    public string ApplicationVersion { get; set; } = "0.2.0";
     public string BuildDate { get; set; } = "2026-Jul-07";
     public DataSettings Data { get; set; } = new();
 

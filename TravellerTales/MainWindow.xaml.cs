@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
+using TravellerTales.Models;
+using TravellerTales.Services;
 
 namespace TravellerTales;
 
@@ -40,13 +42,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _versionText = GetVersionText(settings.ApplicationVersion);
         DataContext = this;
         InitializeComponent();
+        UpdateLandingContinueState();
     }
 
     private void OnNewCharacter(object sender, RoutedEventArgs e)
     {
-        ShowPlaceholder(
-            "New Character Wizard",
-            "This screen will guide new character creation in a future scope.");
+        if (CharacterFileService.HasPausedCreation())
+        {
+            var result = MessageBox.Show(
+                this,
+                "Starting a new character will discard the current paused character creation save. This cannot be reversed.",
+                "Discard Paused Character",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            CharacterFileService.DeletePausedCreation();
+        }
+
+        ShowNewCharacterWizardFresh();
+    }
+
+    private void OnContinueCharacter(object sender, RoutedEventArgs e)
+    {
+        ShowNewCharacterWizardFromPause();
     }
 
     private void OnEditNarratives(object sender, RoutedEventArgs e)
@@ -81,6 +104,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PlaceholderTitle.Text = title;
         PlaceholderBody.Text = body;
         LandingView.Visibility = Visibility.Collapsed;
+        NewCharacterWizardView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Collapsed;
         CreditsView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Visible;
@@ -104,8 +128,110 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         LandingView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
+        NewCharacterWizardView.Visibility = Visibility.Collapsed;
         CreditsView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Visible;
+    }
+
+    private void ShowNewCharacterWizardFresh()
+    {
+        var state = new CharacterCreationState
+        {
+            CurrentStepIndex = 0,
+            Character = new Character
+            {
+                CreationMetadata = new CharacterCreationMetadata
+                {
+                    CreateStartDateTime = DateTime.Now
+                }
+            }
+        };
+
+        NewCharacterWizard.LoadState(state);
+        LandingView.Visibility = Visibility.Collapsed;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Collapsed;
+        CreditsView.Visibility = Visibility.Collapsed;
+        LicensePopup.Visibility = Visibility.Collapsed;
+        NewCharacterWizardView.Visibility = Visibility.Visible;
+    }
+
+    private void ShowNewCharacterWizardFromPause()
+    {
+        CharacterCreationState? state;
+
+        try
+        {
+            state = CharacterFileService.LoadPausedCreation();
+        }
+        catch (Exception)
+        {
+            MessageBox.Show(
+                this,
+                "The paused character creation save could not be loaded.",
+                "Continue Character",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            UpdateLandingContinueState();
+            return;
+        }
+
+        if (state is null)
+        {
+            UpdateLandingContinueState();
+            return;
+        }
+
+        state.Character.CreationMetadata.CreateContinueDateTimes.Add(DateTime.Now);
+        CharacterFileService.SavePausedCreation(state);
+        NewCharacterWizard.LoadState(state);
+
+        LandingView.Visibility = Visibility.Collapsed;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Collapsed;
+        CreditsView.Visibility = Visibility.Collapsed;
+        LicensePopup.Visibility = Visibility.Collapsed;
+        NewCharacterWizardView.Visibility = Visibility.Visible;
+    }
+
+    private void OnSaveCharacterCreation(object sender, CharacterCreationState state)
+    {
+        if (CharacterFileService.HasPausedCreation())
+        {
+            var result = MessageBox.Show(
+                this,
+                "A paused character creation save already exists. Saving now will overwrite it and cannot be reversed.",
+                "Overwrite Paused Character",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+        }
+
+        state.Character.CreationMetadata.CreatePauseDateTimes.Add(DateTime.Now);
+        CharacterFileService.SavePausedCreation(state);
+        ShowLanding();
+    }
+
+    private void OnCancelCharacterCreation(object sender, EventArgs e)
+    {
+        var result = MessageBox.Show(
+            this,
+            "Cancel character creation and discard all current character work?",
+            "Cancel Character Creation",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        CharacterFileService.DeletePausedCreation();
+        ShowLanding();
     }
 
     private void OnSettingsValueChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -251,8 +377,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         SettingsView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
+        NewCharacterWizardView.Visibility = Visibility.Collapsed;
         CreditsView.Visibility = Visibility.Collapsed;
         LicensePopup.Visibility = Visibility.Collapsed;
+        UpdateLandingContinueState();
         LandingView.Visibility = Visibility.Visible;
     }
 
@@ -265,8 +393,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         LandingView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
+        NewCharacterWizardView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Collapsed;
         CreditsView.Visibility = Visibility.Visible;
+    }
+
+    private void UpdateLandingContinueState()
+    {
+        var hasPausedCreation = CharacterFileService.HasPausedCreation();
+        ContinueButton.IsEnabled = hasPausedCreation;
+        ContinueButton.ToolTip = hasPausedCreation
+            ? "Continue paused character creation."
+            : "Continue will be available when an in-progress character exists.";
     }
 
     private static string GetVersionText(string applicationVersion)

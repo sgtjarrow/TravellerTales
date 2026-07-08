@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:TravellerTales.Controls"
         xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
+        xmlns:views="clr-namespace:TravellerTales.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -225,6 +226,7 @@
                                             Width="1672"
                                             Height="941"
                                             IsEnabled="False"
+                                            Click="OnContinueCharacter"
                                             AutomationProperties.Name="Continue"
                                             ToolTip="Continue will be available when an in-progress character exists."
                                             ToolTipService.ShowOnDisabled="True"
@@ -316,6 +318,13 @@
                             Style="{StaticResource PlaceholderButtonStyle}" />
                 </StackPanel>
             </Grid>
+        </Grid>
+
+        <Grid x:Name="NewCharacterWizardView"
+              Visibility="Collapsed">
+            <views:NewCharacterWizardControl x:Name="NewCharacterWizard"
+                                             SaveRequested="OnSaveCharacterCreation"
+                                             CancelRequested="OnCancelCharacterCreation" />
         </Grid>
 
         <Grid x:Name="SettingsView" Visibility="Collapsed">
