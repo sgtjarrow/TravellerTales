@@ -17,6 +17,12 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
+        <Style x:Key="NamePartLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource SectionHeaderTextStyle}">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="#9FEFFF" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+
         <Style x:Key="WizardTextBoxStyle" TargetType="TextBox">
             <Setter Property="Height" Value="42" />
             <Setter Property="Padding" Value="12,0" />
@@ -145,6 +151,18 @@
             <Setter Property="Foreground" Value="#EAFBFF" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+
+        <Style x:Key="RandomNameButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Background" Value="#D0071523" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#EAFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -194,10 +212,139 @@
 
                     <TextBlock Text="NAME"
                                Style="{StaticResource WizardLabelStyle}" />
-                    <TextBox x:Name="NameTextBox"
-                             Grid.Column="1"
-                             Style="{StaticResource WizardTextBoxStyle}"
-                             TextChanged="OnFieldChanged" />
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="42" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid x:Name="HumanNamePanel">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1.1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1.1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="0.7*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="FIRST"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBlock Grid.Column="2"
+                                       Text="MIDDLE"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBlock Grid.Column="4"
+                                       Text="LAST"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBlock Grid.Column="6"
+                                       Text="SUFFIX"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBox x:Name="HumanFirstNameTextBox"
+                                     Grid.Row="1"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="First Name"
+                                     TextChanged="OnFieldChanged" />
+                            <TextBox x:Name="HumanMiddleNameTextBox"
+                                     Grid.Row="1"
+                                     Grid.Column="2"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Middle Name"
+                                     TextChanged="OnFieldChanged" />
+                            <TextBox x:Name="HumanLastNameTextBox"
+                                     Grid.Row="1"
+                                     Grid.Column="4"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Last Name"
+                                     TextChanged="OnFieldChanged" />
+                            <TextBox x:Name="HumanSuffixTextBox"
+                                     Grid.Row="1"
+                                     Grid.Column="6"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Suffix"
+                                     TextChanged="OnFieldChanged" />
+                        </Grid>
+
+                        <Grid x:Name="AslanNamePanel"
+                              Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="FAMILY"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBlock Grid.Column="2"
+                                       Text="PERSONAL"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBox x:Name="AslanFamilyNameTextBox"
+                                     Grid.Row="1"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Family Name"
+                                     TextChanged="OnFieldChanged" />
+                            <TextBox x:Name="AslanPersonalNameTextBox"
+                                     Grid.Row="1"
+                                     Grid.Column="2"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Personal Name"
+                                     TextChanged="OnFieldChanged" />
+                        </Grid>
+
+                        <Grid x:Name="VargrNamePanel"
+                              Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1.1*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="CLAN"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBlock Grid.Column="2"
+                                       Text="ROLE"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBlock Grid.Column="4"
+                                       Text="PERSONAL"
+                                       Style="{StaticResource NamePartLabelStyle}" />
+                            <TextBox x:Name="VargrClanNameTextBox"
+                                     Grid.Row="1"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Clan Name"
+                                     TextChanged="OnFieldChanged" />
+                            <ComboBox x:Name="VargrRoleComboBox"
+                                      Grid.Row="1"
+                                      Grid.Column="2"
+                                      Style="{StaticResource WizardComboBoxStyle}"
+                                      ToolTip="Clan Role"
+                                      SelectionChanged="OnFieldChanged" />
+                            <TextBox x:Name="VargrPersonalNameTextBox"
+                                     Grid.Row="1"
+                                     Grid.Column="4"
+                                     Style="{StaticResource WizardTextBoxStyle}"
+                                     ToolTip="Personal Name"
+                                     TextChanged="OnFieldChanged" />
+                        </Grid>
+
+                        <Button Grid.Column="2"
+                                Content="?"
+                                Style="{StaticResource RandomNameButtonStyle}"
+                                VerticalAlignment="Bottom"
+                                ToolTip="Generate Random Name"
+                                Click="OnGenerateName" />
+                    </Grid>
 
                     <TextBlock Grid.Row="2"
                                Text="RACE"

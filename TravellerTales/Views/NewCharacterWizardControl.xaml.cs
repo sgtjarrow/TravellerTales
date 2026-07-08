@@ -169,7 +169,7 @@ public partial class NewCharacterWizardControl : UserControl
     {
         var character = _state.Character;
         ReviewIdentityText.Text =
-            $"Name: {ValueOrPending(character.Name)}\n" +
+            $"Name: {ValueOrPending(character.DisplayName)}\n" +
             $"Race: {character.Race}\n" +
             $"Gender: {character.Gender}\n" +
             $"Age: {ValueOrPending(character.Age)}\n" +

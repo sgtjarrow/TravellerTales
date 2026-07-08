@@ -80,6 +80,7 @@ public partial class BiographyStepControl : UserControl
         EyeColorComboBox.ItemsSource = SortComboValues(Enum.GetValues<EyeColorType>());
         SkinColorComboBox.ItemsSource = SortComboValues(Enum.GetValues<SkinColorType>());
         HairColorComboBox.ItemsSource = SortComboValues(Enum.GetValues<HairColorType>());
+        VargrRoleComboBox.ItemsSource = SortComboValues(Enum.GetValues<VargrRoleType>());
     }
 
     public void LoadCharacter(Character character)
@@ -88,7 +89,7 @@ public partial class BiographyStepControl : UserControl
         ApplyDefaults(character);
         _isLoading = true;
 
-        NameTextBox.Text = character.Name;
+        SetNameFields(character);
         RaceComboBox.SelectedItem = character.Race;
         HeritageComboBox.SelectedItem = character.Heritage;
         GenderComboBox.SelectedItem = character.Gender;
@@ -133,7 +134,7 @@ public partial class BiographyStepControl : UserControl
 
     private void CaptureFields()
     {
-        _character.Name = NameTextBox.Text.Trim();
+        CaptureNameFields(_character);
         _character.Race = RaceComboBox.SelectedItem is RaceType race ? race : RaceType.Human;
         _character.Heritage = HeritageComboBox.SelectedItem is HeritageType heritage ? heritage : null;
         _character.Gender = GenderComboBox.SelectedItem is GenderType gender ? gender : GenderType.Male;
@@ -188,17 +189,19 @@ public partial class BiographyStepControl : UserControl
 
     private string GetValidationMessage()
     {
-        if (string.IsNullOrWhiteSpace(NameTextBox.Text))
+        var candidate = BuildCharacterNameFromControls();
+
+        if (!candidate.IsNameComplete)
         {
             return "Name is required.";
         }
 
-        if (string.IsNullOrWhiteSpace(CharacterFileService.SanitizeCharacterName(NameTextBox.Text)))
+        if (string.IsNullOrWhiteSpace(candidate.SanitizedDisplayName))
         {
             return "Name must contain at least one letter or number.";
         }
 
-        if (CharacterFileService.FinalCharacterExists(NameTextBox.Text))
+        if (CharacterFileService.FinalCharacterExists(candidate))
         {
             return "A finalized character with this name already exists.";
         }
@@ -235,6 +238,7 @@ public partial class BiographyStepControl : UserControl
 
         EyeColorComboBox.SelectedItem = EyeColorType.Brown;
         UpdateRaceSpecificFields(clearHiddenValues: true);
+        UpdateNamePanels();
         ApplyBodyRange();
         UpdatePortrait();
         OnFieldChanged(sender, e);
@@ -249,6 +253,18 @@ public partial class BiographyStepControl : UserControl
 
         ApplyBodyRange();
         UpdatePortrait();
+        OnFieldChanged(sender, e);
+    }
+
+    private void OnGenerateName(object sender, RoutedEventArgs e)
+    {
+        CaptureFields();
+        CharacterNameGenerator.Generate(_character);
+        _isLoading = true;
+        SetNameFields(_character);
+        _isLoading = false;
+        CaptureFields();
+        Validate(showMessage: false);
         OnFieldChanged(sender, e);
     }
 
@@ -311,6 +327,7 @@ public partial class BiographyStepControl : UserControl
 
         HumanDetailsCard.Visibility = isHuman ? Visibility.Visible : Visibility.Collapsed;
         NonHumanDetailsCard.Visibility = isHuman ? Visibility.Collapsed : Visibility.Visible;
+        UpdateNamePanels();
 
         if (isHuman && HeritageComboBox.SelectedItem is null)
         {
@@ -417,11 +434,73 @@ public partial class BiographyStepControl : UserControl
 
     private void UpdateRequiredFieldBorders()
     {
-        SetControlValidity(NameTextBox, !string.IsNullOrWhiteSpace(NameTextBox.Text));
+        UpdateNameFieldBorders();
         SetControlValidity(RaceComboBox, RaceComboBox.SelectedItem is RaceType);
         SetControlValidity(GenderComboBox, GenderComboBox.SelectedItem is GenderType);
         HeightStepperBorder.BorderBrush = HeightStepper.Value > 0 ? ValidBorderBrush : InvalidBorderBrush;
         WeightStepperBorder.BorderBrush = WeightStepper.Value > 0 ? ValidBorderBrush : InvalidBorderBrush;
+    }
+
+    private void SetNameFields(Character character)
+    {
+        HumanFirstNameTextBox.Text = character.HumanFirstName;
+        HumanMiddleNameTextBox.Text = character.HumanMiddleName;
+        HumanLastNameTextBox.Text = character.HumanLastName;
+        HumanSuffixTextBox.Text = character.HumanSuffix;
+        AslanFamilyNameTextBox.Text = character.AslanFamilyName;
+        AslanPersonalNameTextBox.Text = character.AslanPersonalName;
+        VargrClanNameTextBox.Text = character.VargrClanName;
+        VargrRoleComboBox.SelectedItem = character.VargrRole;
+        VargrPersonalNameTextBox.Text = character.VargrPersonalName;
+        UpdateNamePanels();
+    }
+
+    private void CaptureNameFields(Character character)
+    {
+        character.HumanFirstName = HumanFirstNameTextBox.Text.Trim();
+        character.HumanMiddleName = HumanMiddleNameTextBox.Text.Trim();
+        character.HumanLastName = HumanLastNameTextBox.Text.Trim();
+        character.HumanSuffix = HumanSuffixTextBox.Text.Trim();
+        character.AslanFamilyName = AslanFamilyNameTextBox.Text.Trim();
+        character.AslanPersonalName = AslanPersonalNameTextBox.Text.Trim();
+        character.VargrClanName = VargrClanNameTextBox.Text.Trim();
+        character.VargrRole = VargrRoleComboBox.SelectedItem is VargrRoleType role ? role : null;
+        character.VargrPersonalName = VargrPersonalNameTextBox.Text.Trim();
+    }
+
+    private Character BuildCharacterNameFromControls()
+    {
+        var character = new Character
+        {
+            Race = RaceComboBox.SelectedItem is RaceType race ? race : RaceType.Human
+        };
+        CaptureNameFields(character);
+        return character;
+    }
+
+    private void UpdateNamePanels()
+    {
+        var race = RaceComboBox.SelectedItem is RaceType selectedRace ? selectedRace : RaceType.Human;
+        HumanNamePanel.Visibility = race == RaceType.Human ? Visibility.Visible : Visibility.Collapsed;
+        AslanNamePanel.Visibility = race == RaceType.Aslan ? Visibility.Visible : Visibility.Collapsed;
+        VargrNamePanel.Visibility = race == RaceType.Vargr ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void UpdateNameFieldBorders()
+    {
+        var race = RaceComboBox.SelectedItem is RaceType selectedRace ? selectedRace : RaceType.Human;
+
+        SetControlValidity(HumanFirstNameTextBox, race != RaceType.Human || !string.IsNullOrWhiteSpace(HumanFirstNameTextBox.Text));
+        SetControlValidity(HumanMiddleNameTextBox, true);
+        SetControlValidity(HumanLastNameTextBox, race != RaceType.Human || !string.IsNullOrWhiteSpace(HumanLastNameTextBox.Text));
+        SetControlValidity(HumanSuffixTextBox, true);
+
+        SetControlValidity(AslanFamilyNameTextBox, race != RaceType.Aslan || !string.IsNullOrWhiteSpace(AslanFamilyNameTextBox.Text));
+        SetControlValidity(AslanPersonalNameTextBox, race != RaceType.Aslan || !string.IsNullOrWhiteSpace(AslanPersonalNameTextBox.Text));
+
+        SetControlValidity(VargrClanNameTextBox, race != RaceType.Vargr || !string.IsNullOrWhiteSpace(VargrClanNameTextBox.Text));
+        SetControlValidity(VargrRoleComboBox, race != RaceType.Vargr || VargrRoleComboBox.SelectedItem is VargrRoleType);
+        SetControlValidity(VargrPersonalNameTextBox, race != RaceType.Vargr || !string.IsNullOrWhiteSpace(VargrPersonalNameTextBox.Text));
     }
 
     private void SetHumanDefaultsIfNeeded()

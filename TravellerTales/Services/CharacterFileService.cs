@@ -38,7 +38,9 @@ public static class CharacterFileService
         }
 
         var json = File.ReadAllText(PausedCreationPath);
-        return JsonSerializer.Deserialize<CharacterCreationState>(json, JsonOptions);
+        var state = JsonSerializer.Deserialize<CharacterCreationState>(json, JsonOptions);
+        state?.Character.NormalizeAfterLoad();
+        return state;
     }
 
     public static void SavePausedCreation(CharacterCreationState state)
@@ -76,10 +78,21 @@ public static class CharacterFileService
         return Path.Combine(AppPaths.CharactersDirectory, $"{SanitizeCharacterName(name)}.json");
     }
 
+    public static string GetFinalCharacterPath(Character character)
+    {
+        return Path.Combine(AppPaths.CharactersDirectory, $"{character.SanitizedDisplayName}.json");
+    }
+
     public static bool FinalCharacterExists(string name)
     {
         var sanitizedName = SanitizeCharacterName(name);
         return !string.IsNullOrWhiteSpace(sanitizedName) && File.Exists(GetFinalCharacterPath(name));
+    }
+
+    public static bool FinalCharacterExists(Character character)
+    {
+        return !string.IsNullOrWhiteSpace(character.SanitizedDisplayName) &&
+               File.Exists(GetFinalCharacterPath(character));
     }
 }
 
