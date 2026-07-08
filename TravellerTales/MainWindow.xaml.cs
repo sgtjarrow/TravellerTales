@@ -1,6 +1,9 @@
 using System.Windows;
 using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 
 namespace TravellerTales;
 
@@ -9,8 +12,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private AppSettings _settings;
     private int _loadedSplashDurationSeconds;
     private string _loadedApplicationVersion = string.Empty;
+    private string _loadedBuildDate = string.Empty;
     private string _versionText;
     private bool _isLoadingSettings;
+    private const string BuildDateFormat = "yyyy-MMM-dd";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -58,9 +63,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnCredits(object sender, RoutedEventArgs e)
     {
-        ShowPlaceholder(
-            "Credits",
-            "Traveller Tales credits and about information will appear here.");
+        ShowCredits();
     }
 
     private void OnExit(object sender, RoutedEventArgs e)
@@ -79,6 +82,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PlaceholderBody.Text = body;
         LandingView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Collapsed;
+        CreditsView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Visible;
     }
 
@@ -87,10 +91,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _settings = AppSettings.Load();
         _loadedSplashDurationSeconds = _settings.SplashDurationSeconds;
         _loadedApplicationVersion = _settings.ApplicationVersion;
+        _loadedBuildDate = NormalizeBuildDate(_settings.BuildDate);
 
         _isLoadingSettings = true;
         SplashDurationTextBox.Text = _loadedSplashDurationSeconds.ToString();
         ApplicationVersionTextBox.Text = _loadedApplicationVersion;
+        SetBuildDatePickerText(_loadedBuildDate);
         SettingsValidationMessage.Text = string.Empty;
         _isLoadingSettings = false;
 
@@ -98,6 +104,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         LandingView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
+        CreditsView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Visible;
     }
 
@@ -112,19 +119,37 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         UpdateSettingsDirtyState();
     }
 
+    private void OnSettingsDateChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        if (BuildDatePicker.SelectedDate.HasValue)
+        {
+            BuildDatePicker.Text = FormatBuildDate(BuildDatePicker.SelectedDate.Value);
+        }
+
+        SettingsValidationMessage.Text = string.Empty;
+        UpdateSettingsDirtyState();
+    }
+
     private void OnSaveSettings(object sender, RoutedEventArgs e)
     {
-        if (!TryReadSettingsForm(out var splashDurationSeconds, out var applicationVersion))
+        if (!TryReadSettingsForm(out var splashDurationSeconds, out var applicationVersion, out var buildDate))
         {
             return;
         }
 
         _settings.SplashDurationSeconds = splashDurationSeconds;
         _settings.ApplicationVersion = applicationVersion;
+        _settings.BuildDate = buildDate;
         _settings.Save();
 
         _loadedSplashDurationSeconds = splashDurationSeconds;
         _loadedApplicationVersion = applicationVersion;
+        _loadedBuildDate = buildDate;
         VersionText = GetVersionText(applicationVersion);
 
         ShowLanding();
@@ -150,9 +175,38 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ShowLanding();
     }
 
-    private bool TryReadSettingsForm(out int splashDurationSeconds, out string applicationVersion)
+    private void OnCloseCredits(object sender, RoutedEventArgs e)
+    {
+        ShowLanding();
+    }
+
+    private void OnShowLicense(object sender, RoutedEventArgs e)
+    {
+        if (sender is not TextBlock licenseLink ||
+            licenseLink.Tag is not string licenseFileName)
+        {
+            return;
+        }
+
+        LicensePopupTitle.Text = System.Windows.Automation.AutomationProperties.GetName(licenseLink);
+        if (string.IsNullOrWhiteSpace(LicensePopupTitle.Text))
+        {
+            LicensePopupTitle.Text = "Third-Party License";
+        }
+
+        LicensePopupBody.Text = ReadLicenseText(licenseFileName);
+        LicensePopup.Visibility = Visibility.Visible;
+    }
+
+    private void OnCloseLicensePopup(object sender, RoutedEventArgs e)
+    {
+        LicensePopup.Visibility = Visibility.Collapsed;
+    }
+
+    private bool TryReadSettingsForm(out int splashDurationSeconds, out string applicationVersion, out string buildDate)
     {
         applicationVersion = ApplicationVersionTextBox.Text.Trim();
+        buildDate = GetBuildDatePickerText();
 
         if (!int.TryParse(SplashDurationTextBox.Text.Trim(), out splashDurationSeconds) ||
             splashDurationSeconds < 0)
@@ -169,13 +223,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return false;
         }
 
+        if (!TryParseBuildDate(buildDate, out var parsedBuildDate))
+        {
+            SettingsValidationMessage.Text = $"Build date must use {BuildDateFormat}.";
+            BuildDatePicker.Focus();
+            return false;
+        }
+
+        buildDate = FormatBuildDate(parsedBuildDate);
+        SetBuildDatePickerText(buildDate);
+
         return true;
     }
 
     private void UpdateSettingsDirtyState()
     {
         var isDirty = SplashDurationTextBox.Text.Trim() != _loadedSplashDurationSeconds.ToString() ||
-            ApplicationVersionTextBox.Text.Trim() != _loadedApplicationVersion;
+            ApplicationVersionTextBox.Text.Trim() != _loadedApplicationVersion ||
+            GetBuildDatePickerText() != _loadedBuildDate;
 
         SettingsCloseButton.Visibility = isDirty ? Visibility.Collapsed : Visibility.Visible;
         SettingsSaveButton.Visibility = isDirty ? Visibility.Visible : Visibility.Collapsed;
@@ -186,12 +251,85 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         SettingsView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
+        CreditsView.Visibility = Visibility.Collapsed;
+        LicensePopup.Visibility = Visibility.Collapsed;
         LandingView.Visibility = Visibility.Visible;
+    }
+
+    private void ShowCredits()
+    {
+        _settings = AppSettings.Load();
+        CreditsVersionValue.Text = _settings.ApplicationVersion;
+        CreditsBuildDateValue.Text = NormalizeBuildDate(_settings.BuildDate);
+        LicensePopup.Visibility = Visibility.Collapsed;
+
+        LandingView.Visibility = Visibility.Collapsed;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Collapsed;
+        CreditsView.Visibility = Visibility.Visible;
     }
 
     private static string GetVersionText(string applicationVersion)
     {
         return $"Version {applicationVersion}";
+    }
+
+    private static string NormalizeBuildDate(string buildDate)
+    {
+        return TryParseBuildDate(buildDate, out var parsedBuildDate)
+            ? FormatBuildDate(parsedBuildDate)
+            : "2026-Jul-07";
+    }
+
+    private static bool TryParseBuildDate(string buildDate, out DateTime parsedBuildDate)
+    {
+        return DateTime.TryParseExact(
+            buildDate,
+            BuildDateFormat,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out parsedBuildDate);
+    }
+
+    private static string FormatBuildDate(DateTime buildDate)
+    {
+        return buildDate.ToString(BuildDateFormat, CultureInfo.InvariantCulture);
+    }
+
+    private string GetBuildDatePickerText()
+    {
+        return BuildDatePicker.SelectedDate.HasValue
+            ? FormatBuildDate(BuildDatePicker.SelectedDate.Value)
+            : BuildDatePicker.Text.Trim();
+    }
+
+    private void SetBuildDatePickerText(string buildDate)
+    {
+        if (TryParseBuildDate(buildDate, out var parsedBuildDate))
+        {
+            BuildDatePicker.SelectedDate = parsedBuildDate;
+        }
+
+        BuildDatePicker.Text = buildDate;
+    }
+
+    private static string ReadLicenseText(string licenseFileName)
+    {
+        var licensePath = Path.Combine(
+            AppContext.BaseDirectory,
+            "Assets",
+            "Fonts",
+            "Licenses",
+            licenseFileName);
+
+        try
+        {
+            return File.ReadAllText(licensePath);
+        }
+        catch (Exception)
+        {
+            return $"The local license file could not be loaded: {licenseFileName}";
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)

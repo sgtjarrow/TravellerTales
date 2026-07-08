@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:TravellerTales.Controls"
+        xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -77,6 +78,59 @@
             <Setter Property="CaretBrush" Value="#DFFBFF" />
             <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
             <Setter Property="FontSize" Value="22" />
+        </Style>
+
+        <Style x:Key="SettingsDatePickerStyle" TargetType="DatePicker">
+            <Setter Property="Width" Value="250" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="#BF071523" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#DFFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
+            <Setter Property="FontSize" Value="22" />
+        </Style>
+
+        <Style x:Key="SettingsDatePickerTextBoxStyle" TargetType="{x:Type primitives:DatePickerTextBox}">
+            <Setter Property="Background" Value="#BF071523" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#DFFBFF" />
+            <Setter Property="CaretBrush" Value="#DFFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type primitives:DatePickerTextBox}">
+                        <Border Height="44"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          Height="28"
+                                          VerticalAlignment="Center"
+                                          VerticalContentAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LicenseLinkTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#DFFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="TextDecorations" Value="Underline" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#FFFFFF" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
@@ -240,6 +294,8 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="24" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <TextBlock Text="SPLASH DURATION SECONDS"
@@ -265,6 +321,24 @@
                                      Style="{StaticResource SettingsInputStyle}"
                                      TextChanged="OnSettingsValueChanged"
                                      AutomationProperties.Name="Application Version" />
+
+                            <TextBlock Grid.Row="4"
+                                       Text="BUILD DATE"
+                                       Style="{StaticResource SectionHeaderTextStyle}"
+                                       FontSize="24"
+                                       Foreground="#9FEFFF"
+                                       VerticalAlignment="Center" />
+                            <DatePicker x:Name="BuildDatePicker"
+                                        Grid.Row="4"
+                                        Grid.Column="1"
+                                        Style="{StaticResource SettingsDatePickerStyle}"
+                                        SelectedDateChanged="OnSettingsDateChanged"
+                                        AutomationProperties.Name="Build Date">
+                                <DatePicker.Resources>
+                                    <Style TargetType="{x:Type primitives:DatePickerTextBox}"
+                                           BasedOn="{StaticResource SettingsDatePickerTextBoxStyle}" />
+                                </DatePicker.Resources>
+                            </DatePicker>
                         </Grid>
 
                         <TextBlock x:Name="SettingsValidationMessage"
@@ -301,6 +375,254 @@
                     </StackPanel>
                 </Grid>
             </Viewbox>
+        </Grid>
+
+        <Grid x:Name="CreditsView" Visibility="Collapsed">
+            <Viewbox Stretch="UniformToFill"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Stretch">
+                <Grid Width="1672"
+                      Height="941">
+                    <Image Source="pack://application:,,,/Assets/credits.png"
+                           Stretch="Fill" />
+
+                    <Grid Margin="210,150,210,145"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          IsHitTestVisible="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="CREDITS"
+                                   Style="{StaticResource AppTitleTextStyle}"
+                                   FontSize="54"
+                                   Foreground="#D8F8FF"
+                                   HorizontalAlignment="Center"
+                                   Opacity="0.94" />
+
+                        <Grid Grid.Row="1"
+                              Margin="0,54,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.18*" />
+                                <ColumnDefinition Width="0.82*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0"
+                                        Margin="0,0,20,0">
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="260" />
+                                        <ColumnDefinition Width="300" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="APPLICATION NAME:"
+                                               Style="{StaticResource SectionHeaderTextStyle}"
+                                               FontSize="23"
+                                               Foreground="#9FEFFF" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="Traveller Tales"
+                                               Style="{StaticResource DataFieldTextStyle}"
+                                               FontSize="25"
+                                               Foreground="#EAFBFF" />
+
+                                    <TextBlock Grid.Row="2"
+                                               Text="VERSION:"
+                                               Style="{StaticResource SectionHeaderTextStyle}"
+                                               FontSize="23"
+                                               Foreground="#9FEFFF" />
+                                    <TextBlock x:Name="CreditsVersionValue"
+                                               Grid.Row="2"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DataFieldTextStyle}"
+                                               FontSize="25"
+                                               Foreground="#EAFBFF" />
+
+                                    <TextBlock Grid.Row="4"
+                                               Text="BUILD DATE:"
+                                               Style="{StaticResource SectionHeaderTextStyle}"
+                                               FontSize="23"
+                                               Foreground="#9FEFFF" />
+                                    <TextBlock x:Name="CreditsBuildDateValue"
+                                               Grid.Row="4"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DataFieldTextStyle}"
+                                               FontSize="25"
+                                               Foreground="#EAFBFF" />
+                                </Grid>
+
+                                <StackPanel Margin="0,72,0,0"
+                                            HorizontalAlignment="Center">
+                                    <TextBlock Text="©2026 Jarrow Enclave. All Rights Reserved"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontSize="24"
+                                               Foreground="#D8F8FF"
+                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="Created by Robert &quot;Wizard&quot; Johnson"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontSize="24"
+                                               Foreground="#D8F8FF"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,22,0,0" />
+                                    <TextBlock Text="Support: sgt.jarrow@gmail.com"
+                                               Style="{StaticResource DataFieldTextStyle}"
+                                               FontSize="23"
+                                               Foreground="#BFEFFF"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,44,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                                        Margin="28,0,0,0"
+                                        HorizontalAlignment="Center">
+                                <TextBlock Text="THIRD-PARTY LICENSES"
+                                           Style="{StaticResource SectionHeaderTextStyle}"
+                                           FontSize="30"
+                                           Foreground="#9FEFFF"
+                                           TextDecorations="Underline"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,28" />
+                                <TextBlock Text="FONTS"
+                                           Style="{StaticResource SectionHeaderTextStyle}"
+                                           FontSize="24"
+                                           Foreground="#9FEFFF"
+                                           HorizontalAlignment="Left"
+                                           Margin="0,0,0,20" />
+
+                                <Grid Width="520"
+                                      HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="190" />
+                                        <ColumnDefinition Width="330" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="Orbitron"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontSize="21"
+                                               Foreground="#D8F8FF" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="SIL Open Font License 1.1"
+                                               Tag="OFL-Orbitron.txt"
+                                               MouseLeftButtonUp="OnShowLicense"
+                                               AutomationProperties.Name="Orbitron License"
+                                               Style="{StaticResource LicenseLinkTextStyle}" />
+
+                                    <TextBlock Grid.Row="2"
+                                               Text="Rajdhani"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontSize="21"
+                                               Foreground="#D8F8FF" />
+                                    <TextBlock Grid.Row="2"
+                                               Grid.Column="1"
+                                               Text="SIL Open Font License 1.1"
+                                               Tag="OFL-Rajdhani.txt"
+                                               MouseLeftButtonUp="OnShowLicense"
+                                               AutomationProperties.Name="Rajdhani License"
+                                               Style="{StaticResource LicenseLinkTextStyle}" />
+
+                                    <TextBlock Grid.Row="4"
+                                               Text="Exo 2"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontSize="21"
+                                               Foreground="#D8F8FF" />
+                                    <TextBlock Grid.Row="4"
+                                               Grid.Column="1"
+                                               Text="SIL Open Font License 1.1"
+                                               Tag="OFL-Exo2.txt"
+                                               MouseLeftButtonUp="OnShowLicense"
+                                               AutomationProperties.Name="Exo 2 License"
+                                               Style="{StaticResource LicenseLinkTextStyle}" />
+
+                                    <TextBlock Grid.Row="6"
+                                               Text="Share Tech Mono"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontSize="21"
+                                               Foreground="#D8F8FF" />
+                                    <TextBlock Grid.Row="6"
+                                               Grid.Column="1"
+                                               Text="SIL Open Font License 1.1"
+                                               Tag="OFL-ShareTechMono.txt"
+                                               MouseLeftButtonUp="OnShowLicense"
+                                               AutomationProperties.Name="Share Tech Mono License"
+                                               Style="{StaticResource LicenseLinkTextStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Grid.Row="2"
+                                Content="Close"
+                                Click="OnCloseCredits"
+                                HorizontalAlignment="Center"
+                                AutomationProperties.Name="Close Credits"
+                                Style="{StaticResource SettingsButtonStyle}" />
+                    </Grid>
+                </Grid>
+            </Viewbox>
+
+            <Grid x:Name="LicensePopup"
+                  Visibility="Collapsed"
+                  Background="#CC00040A">
+                <Border Width="1180"
+                        Height="760"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="#F0061521"
+                        BorderBrush="#8CE8FF"
+                        BorderThickness="2"
+                        Padding="34">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="LicensePopupTitle"
+                                   Style="{StaticResource SectionHeaderTextStyle}"
+                                   FontSize="34"
+                                   Foreground="#D8F8FF"
+                                   TextWrapping="Wrap" />
+
+                        <ScrollViewer Grid.Row="1"
+                                      Margin="0,24,0,24"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <TextBlock x:Name="LicensePopupBody"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       FontSize="18"
+                                       LineHeight="25"
+                                       Foreground="#EAFBFF"
+                                       TextWrapping="Wrap" />
+                        </ScrollViewer>
+
+                        <Button Grid.Row="2"
+                                Content="Close"
+                                Click="OnCloseLicensePopup"
+                                HorizontalAlignment="Center"
+                                AutomationProperties.Name="Close License"
+                                Style="{StaticResource SettingsButtonStyle}" />
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
