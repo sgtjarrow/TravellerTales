@@ -128,7 +128,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (BuildDatePicker.SelectedDate.HasValue)
         {
-            BuildDatePicker.Text = FormatBuildDate(BuildDatePicker.SelectedDate.Value);
+            SetBuildDatePickerText(FormatBuildDate(BuildDatePicker.SelectedDate.Value));
         }
 
         SettingsValidationMessage.Text = string.Empty;
@@ -300,7 +300,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         return BuildDatePicker.SelectedDate.HasValue
             ? FormatBuildDate(BuildDatePicker.SelectedDate.Value)
-            : BuildDatePicker.Text.Trim();
+            : BuildDatePicker.Tag?.ToString()?.Trim() ?? string.Empty;
     }
 
     private void SetBuildDatePickerText(string buildDate)
@@ -310,6 +310,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             BuildDatePicker.SelectedDate = parsedBuildDate;
         }
 
+        BuildDatePicker.Tag = buildDate;
         BuildDatePicker.Text = buildDate;
     }
 

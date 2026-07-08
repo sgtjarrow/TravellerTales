@@ -90,31 +90,91 @@
             <Setter Property="Foreground" Value="#DFFBFF" />
             <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
             <Setter Property="FontSize" Value="22" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePicker">
+                        <Grid x:Name="PART_Root"
+                              Width="{TemplateBinding Width}"
+                              Height="{TemplateBinding Height}">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    SnapsToDevicePixels="True">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="38" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <primitives:DatePickerTextBox x:Name="PART_TextBox"
+                                                                  Grid.Column="0"
+                                                                  Visibility="Collapsed"
+                                                                  Background="Transparent"
+                                                                  BorderBrush="Transparent"
+                                                                  BorderThickness="0"
+                                                                  Foreground="{TemplateBinding Foreground}"
+                                                                  FontFamily="{TemplateBinding FontFamily}"
+                                                                  FontSize="{TemplateBinding FontSize}"
+                                                                  Padding="12,0"
+                                                                  HorizontalContentAlignment="Left"
+                                                                  TextAlignment="Left"
+                                                                  VerticalContentAlignment="Center" />
+
+                                    <TextBlock x:Name="BuildDateDisplayText"
+                                               Grid.Column="0"
+                                               Margin="12,0,0,0"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Center"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               FontFamily="{TemplateBinding FontFamily}"
+                                               FontSize="{TemplateBinding FontSize}"
+                                               Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" />
+
+                                    <Button x:Name="PART_Button"
+                                            Grid.Column="1"
+                                            Background="#00000000"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0"
+                                            Foreground="#DFFBFF"
+                                            FontFamily="{StaticResource LabelButtonFontFamily}"
+                                            FontSize="16"
+                                            Content="▼"
+                                            Cursor="Hand" />
+                                </Grid>
+                            </Border>
+
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   Placement="Bottom"
+                                   PlacementTarget="{Binding ElementName=PART_Root}"
+                                   StaysOpen="False" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="SettingsDatePickerTextBoxStyle" TargetType="{x:Type primitives:DatePickerTextBox}">
-            <Setter Property="Background" Value="#BF071523" />
-            <Setter Property="BorderBrush" Value="#5FD9FF" />
-            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Foreground" Value="#DFFBFF" />
             <Setter Property="CaretBrush" Value="#DFFBFF" />
             <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
             <Setter Property="FontSize" Value="22" />
             <Setter Property="Padding" Value="12,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="TextAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type primitives:DatePickerTextBox}">
-                        <Border Height="44"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          Height="28"
-                                          VerticalAlignment="Center"
-                                          VerticalContentAlignment="Center" />
-                        </Border>
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      VerticalContentAlignment="Center"
+                                      Focusable="False" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -123,7 +183,7 @@
         <Style x:Key="LicenseLinkTextStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#DFFBFF" />
             <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="TextDecorations" Value="Underline" />
             <Style.Triggers>
@@ -406,8 +466,8 @@
                         <Grid Grid.Row="1"
                               Margin="0,54,0,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.18*" />
-                                <ColumnDefinition Width="0.82*" />
+                                <ColumnDefinition Width="1.1*" />
+                                <ColumnDefinition Width="0.9*" />
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0"
@@ -483,27 +543,27 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1"
-                                        Margin="28,0,0,0"
+                                        Margin="20,0,0,0"
                                         HorizontalAlignment="Center">
                                 <TextBlock Text="THIRD-PARTY LICENSES"
                                            Style="{StaticResource SectionHeaderTextStyle}"
-                                           FontSize="30"
+                                           FontSize="27"
                                            Foreground="#9FEFFF"
                                            TextDecorations="Underline"
                                            HorizontalAlignment="Center"
                                            Margin="0,0,0,28" />
                                 <TextBlock Text="FONTS"
                                            Style="{StaticResource SectionHeaderTextStyle}"
-                                           FontSize="24"
+                                           FontSize="22"
                                            Foreground="#9FEFFF"
                                            HorizontalAlignment="Left"
                                            Margin="0,0,0,20" />
 
-                                <Grid Width="520"
+                                <Grid Width="480"
                                       HorizontalAlignment="Center">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="190" />
-                                        <ColumnDefinition Width="330" />
+                                        <ColumnDefinition Width="170" />
+                                        <ColumnDefinition Width="310" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -517,7 +577,7 @@
 
                                     <TextBlock Text="Orbitron"
                                                Style="{StaticResource BodyTextStyle}"
-                                               FontSize="21"
+                                               FontSize="19"
                                                Foreground="#D8F8FF" />
                                     <TextBlock Grid.Column="1"
                                                Text="SIL Open Font License 1.1"
@@ -529,7 +589,7 @@
                                     <TextBlock Grid.Row="2"
                                                Text="Rajdhani"
                                                Style="{StaticResource BodyTextStyle}"
-                                               FontSize="21"
+                                               FontSize="19"
                                                Foreground="#D8F8FF" />
                                     <TextBlock Grid.Row="2"
                                                Grid.Column="1"
@@ -542,7 +602,7 @@
                                     <TextBlock Grid.Row="4"
                                                Text="Exo 2"
                                                Style="{StaticResource BodyTextStyle}"
-                                               FontSize="21"
+                                               FontSize="19"
                                                Foreground="#D8F8FF" />
                                     <TextBlock Grid.Row="4"
                                                Grid.Column="1"
@@ -555,7 +615,7 @@
                                     <TextBlock Grid.Row="6"
                                                Text="Share Tech Mono"
                                                Style="{StaticResource BodyTextStyle}"
-                                               FontSize="21"
+                                               FontSize="19"
                                                Foreground="#D8F8FF" />
                                     <TextBlock Grid.Row="6"
                                                Grid.Column="1"
