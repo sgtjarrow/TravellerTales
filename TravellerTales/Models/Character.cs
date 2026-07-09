@@ -42,6 +42,8 @@ public sealed class Character
     public FurColorType? FurSecondaryColor { get; set; }
     public string Description { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
+    public string HomeworldId { get; set; } = string.Empty;
+    public Homeworld Homeworld { get; set; } = new();
     public CharacterCreationMetadata CreationMetadata { get; set; } = new();
 
     [JsonIgnore]
@@ -69,6 +71,15 @@ public sealed class Character
 
     public void NormalizeAfterLoad()
     {
+        Homeworld ??= new();
+        HomeworldId = string.IsNullOrWhiteSpace(HomeworldId) ? Homeworld.Id : HomeworldId;
+        Homeworld.Id = string.IsNullOrWhiteSpace(Homeworld.Id) ? HomeworldId : Homeworld.Id;
+        Homeworld.WorldSizeValue = Math.Clamp(Homeworld.WorldSizeValue, 0, 10);
+        Homeworld.AtmosphereValue = Math.Clamp(Homeworld.AtmosphereValue, 0, 15);
+        Homeworld.TemperatureKey = TemperatureCatalog.IsValidKey(Homeworld.TemperatureKey)
+            ? Homeworld.TemperatureKey
+            : TemperatureCatalog.Swinging.Key;
+        Homeworld.HydrographicsValue = Math.Clamp(Homeworld.HydrographicsValue, 0, 10);
         ApplyLegacyNameIfNeeded();
     }
 
@@ -179,6 +190,272 @@ public sealed class Character
         }
 
         return builder.ToString();
+    }
+}
+
+public sealed class Homeworld
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+    public int WorldSizeValue { get; set; }
+    public int AtmosphereValue { get; set; }
+    public string TemperatureKey { get; set; } = TemperatureCatalog.SwingingKey;
+    public int HydrographicsValue { get; set; }
+
+    [JsonIgnore]
+    public string Uwp => BuildUwp(WorldSizeValue, AtmosphereValue, HydrographicsValue);
+
+    public static string BuildUwp(int worldSizeValue, int atmosphereValue, int hydrographicsValue)
+    {
+        var worldSize = WorldSizeCatalog.FromValue(Math.Clamp(worldSizeValue, 0, 10));
+        var atmosphere = AtmosphereCatalog.FromValue(Math.Clamp(atmosphereValue, 0, 15));
+        var hydrographics = HydrographicsCatalog.FromValue(Math.Clamp(hydrographicsValue, 0, 10));
+
+        return $"{worldSize.Code}{atmosphere.Code}{hydrographics.Code}";
+    }
+}
+
+public sealed record WorldSizeDefinition(
+    string Name,
+    int Value,
+    string Code,
+    string Diameter,
+    string SurfaceGravity);
+
+public static class WorldSizeCatalog
+{
+    public static readonly WorldSizeDefinition AsteroidBelt = new("Asteroid Belt", 0, "0", "Less Than 1,000 km", "None");
+    public static readonly WorldSizeDefinition Minuscule = new("Minuscule", 1, "1", "1,600 km", "0.05 g");
+    public static readonly WorldSizeDefinition Tiny = new("Tiny", 2, "2", "3,200 km", "0.15 g");
+    public static readonly WorldSizeDefinition Small = new("Small", 3, "3", "4,800 km", "0.25 g");
+    public static readonly WorldSizeDefinition Modest = new("Modest", 4, "4", "6,400 km", "0.35 g");
+    public static readonly WorldSizeDefinition Medium = new("Medium", 5, "5", "8,000 km", "0.45 g");
+    public static readonly WorldSizeDefinition Large = new("Large", 6, "6", "9,600 km", "0.70 g");
+    public static readonly WorldSizeDefinition Huge = new("Huge", 7, "7", "11,200 km", "0.90 g");
+    public static readonly WorldSizeDefinition Vast = new("Vast", 8, "8", "12,800 km", "1.00 g");
+    public static readonly WorldSizeDefinition Enormous = new("Enormous", 9, "9", "14,400 km", "1.25 g");
+    public static readonly WorldSizeDefinition Colossal = new("Colossal", 10, "A", "16,000 km", "1.40 g");
+
+    public static IReadOnlyList<WorldSizeDefinition> All { get; } =
+    [
+        AsteroidBelt,
+        Minuscule,
+        Tiny,
+        Small,
+        Modest,
+        Medium,
+        Large,
+        Huge,
+        Vast,
+        Enormous,
+        Colossal
+    ];
+
+    public static WorldSizeDefinition FromValue(int value)
+    {
+        return value switch
+        {
+            0 => AsteroidBelt,
+            1 => Minuscule,
+            2 => Tiny,
+            3 => Small,
+            4 => Modest,
+            5 => Medium,
+            6 => Large,
+            7 => Huge,
+            8 => Vast,
+            9 => Enormous,
+            10 => Colossal,
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, "World size value must be 0..10.")
+        };
+    }
+}
+
+public sealed record AtmosphereDefinition(
+    string Name,
+    int Value,
+    string Code,
+    string Pressure,
+    string SurvivalGear,
+    int TemperatureModifier,
+    int HydrographicsModifier);
+
+public static class AtmosphereCatalog
+{
+    public static readonly AtmosphereDefinition None = new("None", 0, "0", "0.00 bars", "Vacc Suit", 0, -4);
+    public static readonly AtmosphereDefinition Trace = new("Trace", 1, "1", "0.05 bars", "Vacc Suit", 0, -4);
+    public static readonly AtmosphereDefinition VeryThinTainted = new("Very Thin, Tainted", 2, "2", "0.25 bars", "Filter, Respirator", -2, 0);
+    public static readonly AtmosphereDefinition VeryThin = new("Very Thin", 3, "3", "0.25 bars", "Respirator", -2, 0);
+    public static readonly AtmosphereDefinition ThinTainted = new("Thin, Tainted", 4, "4", "0.60 bars", "Filter", -1, 0);
+    public static readonly AtmosphereDefinition Thin = new("Thin", 5, "5", "0.60 bars", "None", -1, 0);
+    public static readonly AtmosphereDefinition Standard = new("Standard", 6, "6", "1.00 bars", "None", 0, 0);
+    public static readonly AtmosphereDefinition StandardTainted = new("Standard, Tainted", 7, "7", "1.00 bars", "Filter", 0, 0);
+    public static readonly AtmosphereDefinition Dense = new("Dense", 8, "8", "2.00 bars", "None", 1, 0);
+    public static readonly AtmosphereDefinition DenseTainted = new("Dense, Tainted", 9, "9", "2.00 bars", "Filter", 1, 0);
+    public static readonly AtmosphereDefinition Exotic = new("Exotic", 10, "A", "Varies", "Air Supply", 2, -4);
+    public static readonly AtmosphereDefinition Corrosive = new("Corrosive", 11, "B", "Varies", "Vacc Suit", 6, -4);
+    public static readonly AtmosphereDefinition Insidious = new("Insidious", 12, "C", "Varies", "Vacc Suit", 6, -4);
+    public static readonly AtmosphereDefinition VeryDense = new("Very Dense", 13, "D", "Greater Than 2.50 bars", "None", 2, -4);
+    public static readonly AtmosphereDefinition Low = new("Low", 14, "E", "Less Than 0.50 bars", "None", -1, -4);
+    public static readonly AtmosphereDefinition Unusual = new("Unusual", 15, "F", "Varies", "Varies", 2, -4);
+
+    public static IReadOnlyList<AtmosphereDefinition> All { get; } =
+    [
+        None,
+        Trace,
+        VeryThinTainted,
+        VeryThin,
+        ThinTainted,
+        Thin,
+        Standard,
+        StandardTainted,
+        Dense,
+        DenseTainted,
+        Exotic,
+        Corrosive,
+        Insidious,
+        VeryDense,
+        Low,
+        Unusual
+    ];
+
+    public static AtmosphereDefinition FromValue(int value)
+    {
+        return value switch
+        {
+            0 => None,
+            1 => Trace,
+            2 => VeryThinTainted,
+            3 => VeryThin,
+            4 => ThinTainted,
+            5 => Thin,
+            6 => Standard,
+            7 => StandardTainted,
+            8 => Dense,
+            9 => DenseTainted,
+            10 => Exotic,
+            11 => Corrosive,
+            12 => Insidious,
+            13 => VeryDense,
+            14 => Low,
+            15 => Unusual,
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Atmosphere value must be 0..15.")
+        };
+    }
+}
+
+public sealed record TemperatureDefinition(
+    string Key,
+    string Name,
+    string Range,
+    int HydrographicsModifier);
+
+public static class TemperatureCatalog
+{
+    public const string FrozenKey = "Frozen";
+    public const string ColdKey = "Cold";
+    public const string TemperateKey = "Temperate";
+    public const string HotKey = "Hot";
+    public const string BoilingKey = "Boiling";
+    public const string SwingingKey = "Swinging";
+
+    public static readonly TemperatureDefinition Frozen = new(FrozenKey, "Frozen", "Less than -51 C", 0);
+    public static readonly TemperatureDefinition Cold = new(ColdKey, "Cold", "-50 C to -1 C", 0);
+    public static readonly TemperatureDefinition Temperate = new(TemperateKey, "Temperate", "0 C to 30 C", 0);
+    public static readonly TemperatureDefinition Hot = new(HotKey, "Hot", "31 C to 80 C", -2);
+    public static readonly TemperatureDefinition Boiling = new(BoilingKey, "Boiling", "Greater than 80 C", -6);
+    public static readonly TemperatureDefinition Swinging = new(SwingingKey, "Swinging", "Swings wildly from day to night", 0);
+
+    public static IReadOnlyList<TemperatureDefinition> All { get; } =
+    [
+        Frozen,
+        Cold,
+        Temperate,
+        Hot,
+        Boiling,
+        Swinging
+    ];
+
+    public static TemperatureDefinition FromKey(string? key)
+    {
+        return key switch
+        {
+            FrozenKey => Frozen,
+            ColdKey => Cold,
+            TemperateKey => Temperate,
+            HotKey => Hot,
+            BoilingKey => Boiling,
+            SwingingKey => Swinging,
+            _ => throw new ArgumentOutOfRangeException(nameof(key), key, "Temperature key is invalid.")
+        };
+    }
+
+    public static bool IsValidKey(string? key)
+    {
+        return All.Any(temperature => string.Equals(temperature.Key, key, StringComparison.Ordinal));
+    }
+}
+
+public sealed record HydrographicsDefinition(
+    string Name,
+    int Value,
+    string Code,
+    string Percentage,
+    int TechLevelModifier);
+
+public static class HydrographicsCatalog
+{
+    public static readonly HydrographicsDefinition Desert = new("Desert", 0, "0", "0% to 5%", 1);
+    public static readonly HydrographicsDefinition Desiccated = new("Desiccated", 1, "1", "6% to 15%", 0);
+    public static readonly HydrographicsDefinition Arid = new("Arid", 2, "2", "16% to 25%", 0);
+    public static readonly HydrographicsDefinition Sparse = new("Sparse", 3, "3", "26% to 35%", 0);
+    public static readonly HydrographicsDefinition Limited = new("Limited", 4, "4", "36% to 45%", 0);
+    public static readonly HydrographicsDefinition Partial = new("Partial", 5, "5", "46% to 55%", 0);
+    public static readonly HydrographicsDefinition Balanced = new("Balanced", 6, "6", "56% to 65%", 0);
+    public static readonly HydrographicsDefinition Abundant = new("Abundant", 7, "7", "66% to 75%", 0);
+    public static readonly HydrographicsDefinition Dominant = new("Dominant", 8, "8", "76% to 85%", 0);
+    public static readonly HydrographicsDefinition Oceanic = new("Oceanic", 9, "9", "86% to 95%", 1);
+    public static readonly HydrographicsDefinition Aquaplanet = new("Aquaplanet", 10, "A", "96% to 100%", 1);
+
+    public static IReadOnlyList<HydrographicsDefinition> All { get; } =
+    [
+        Desert,
+        Desiccated,
+        Arid,
+        Sparse,
+        Limited,
+        Partial,
+        Balanced,
+        Abundant,
+        Dominant,
+        Oceanic,
+        Aquaplanet
+    ];
+
+    public static HydrographicsDefinition FromValue(int value)
+    {
+        return value switch
+        {
+            0 => Desert,
+            1 => Desiccated,
+            2 => Arid,
+            3 => Sparse,
+            4 => Limited,
+            5 => Partial,
+            6 => Balanced,
+            7 => Abundant,
+            8 => Dominant,
+            9 => Oceanic,
+            10 => Aquaplanet,
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Hydrographics value must be 0..10.")
+        };
+    }
+
+    public static HydrographicsDefinition FromCode(string code)
+    {
+        return All.FirstOrDefault(hydrographics => string.Equals(hydrographics.Code, code, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"Unknown hydrographics code: '{code}'.", nameof(code));
     }
 }
 

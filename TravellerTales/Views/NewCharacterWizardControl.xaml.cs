@@ -2,7 +2,9 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using TravellerTales.Models;
+using TravellerTales.Services;
 
 namespace TravellerTales.Views;
 
@@ -16,6 +18,14 @@ public partial class NewCharacterWizardControl : UserControl
         "Background Skills",
         "Review"
     ];
+    private static readonly string[] StepBackgroundAssetNames =
+    [
+        "medical_scan.png",
+        "homeworld.png",
+        "medical_scan.png",
+        "medical_scan.png",
+        "medical_scan.png"
+    ];
 
     private CharacterCreationState _state = new();
 
@@ -27,13 +37,16 @@ public partial class NewCharacterWizardControl : UserControl
     {
         InitializeComponent();
         BiographyStep.ValidityChanged += OnBiographyValidityChanged;
+        HomeworldStep.ValidityChanged += OnHomeworldValidityChanged;
     }
 
     public void LoadState(CharacterCreationState state)
     {
         _state = state;
         _state.CurrentStepIndex = Math.Clamp(_state.CurrentStepIndex, 0, StepNames.Length - 1);
+        _state.Character.Homeworld ??= new();
         BiographyStep.LoadCharacter(_state.Character);
+        HomeworldStep.LoadState(_state);
         UpdateStep();
     }
 
@@ -46,7 +59,17 @@ public partial class NewCharacterWizardControl : UserControl
             return;
         }
 
+        if (_state.CurrentStepIndex == 1 && !HomeworldStep.TryCommitRequired())
+        {
+            return;
+        }
+
         CaptureCurrentStep();
+
+        if (_state.CurrentStepIndex == 1 && !TrySaveHomeworld())
+        {
+            return;
+        }
 
         if (_state.CurrentStepIndex >= StepNames.Length - 1)
         {
@@ -85,11 +108,23 @@ public partial class NewCharacterWizardControl : UserControl
         }
     }
 
+    private void OnHomeworldValidityChanged(object? sender, EventArgs e)
+    {
+        if (_state.CurrentStepIndex == 1)
+        {
+            NextButton.IsEnabled = HomeworldStep.IsComplete();
+        }
+    }
+
     private void CaptureCurrentStep()
     {
         if (_state.CurrentStepIndex == 0)
         {
             BiographyStep.CommitPartial();
+        }
+        else if (_state.CurrentStepIndex == 1)
+        {
+            HomeworldStep.CommitPartial();
         }
     }
 
@@ -109,21 +144,55 @@ public partial class NewCharacterWizardControl : UserControl
         return false;
     }
 
+    private bool TrySaveHomeworld()
+    {
+        try
+        {
+            var homeworld = _state.Character.Homeworld;
+            HomeworldFileService.SaveHomeworld(homeworld);
+            _state.Character.HomeworldId = homeworld.Id;
+            return true;
+        }
+        catch (InvalidOperationException exception)
+        {
+            HomeworldStep.SetValidationMessage(exception.Message);
+            return false;
+        }
+        catch (Exception)
+        {
+            HomeworldStep.SetValidationMessage("The Homeworld file could not be saved. Stay on this step and try again.");
+            return false;
+        }
+    }
+
     private void UpdateStep()
     {
         BiographyStep.Visibility = _state.CurrentStepIndex == 0 ? Visibility.Visible : Visibility.Collapsed;
-        HomeworldPlaceholder.Visibility = _state.CurrentStepIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
+        HomeworldStep.Visibility = _state.CurrentStepIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
         CharacteristicsPlaceholder.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
         BackgroundSkillsPlaceholder.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
         ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
 
         WizardStatusText.Text = $"Step {_state.CurrentStepIndex + 1} of {StepNames.Length}";
         NextButton.Content = _state.CurrentStepIndex == StepNames.Length - 1 ? "Complete" : "Next";
-        NextButton.IsEnabled = _state.CurrentStepIndex == 0 ? BiographyStep.IsComplete() : true;
+        NextButton.IsEnabled = _state.CurrentStepIndex switch
+        {
+            0 => BiographyStep.IsComplete(),
+            1 => HomeworldStep.IsComplete(),
+            _ => true
+        };
         FooterMessageText.Text = string.Empty;
 
+        UpdateBackground();
         UpdateStepIndicators();
         UpdateReview();
+    }
+
+    private void UpdateBackground()
+    {
+        var assetName = StepBackgroundAssetNames[_state.CurrentStepIndex];
+        WizardBackgroundImage.Source = new BitmapImage(
+            new Uri($"pack://application:,,,/Assets/{assetName}", UriKind.Absolute));
     }
 
     private void UpdateStepIndicators()
@@ -168,6 +237,10 @@ public partial class NewCharacterWizardControl : UserControl
     private void UpdateReview()
     {
         var character = _state.Character;
+        var worldSize = WorldSizeCatalog.FromValue(character.Homeworld.WorldSizeValue);
+        var atmosphere = AtmosphereCatalog.FromValue(character.Homeworld.AtmosphereValue);
+        var temperature = TemperatureCatalog.FromKey(character.Homeworld.TemperatureKey);
+        var hydrographics = HydrographicsCatalog.FromValue(character.Homeworld.HydrographicsValue);
         ReviewIdentityText.Text =
             $"Name: {ValueOrPending(character.DisplayName)}\n" +
             $"Race: {character.Race}\n" +
@@ -176,6 +249,12 @@ public partial class NewCharacterWizardControl : UserControl
             $"Height: {ValueOrPending(character.HeightInches)} inches / {character.HeightMeters:0.00} meters\n" +
             $"Weight: {ValueOrPending(character.WeightPounds)} pounds / {character.WeightKilograms:0.00} kilograms\n" +
             $"Eye Color: {character.EyeColor}\n" +
+            $"Homeworld: {ValueOrPending(character.Homeworld.Name)}\n" +
+            $"Homeworld Size: {worldSize.Name} ({worldSize.Code})\n" +
+            $"Homeworld Atmosphere: {atmosphere.Name} ({atmosphere.Code})\n" +
+            $"Homeworld Temperature: {temperature.Name}\n" +
+            $"Homeworld Hydrographics: {hydrographics.Name} ({hydrographics.Code})\n" +
+            $"Homeworld Notes: {ValueOrPending(character.Homeworld.Notes)}\n" +
             $"Description: {ValueOrPending(character.Description)}";
 
         var metadata = character.CreationMetadata;

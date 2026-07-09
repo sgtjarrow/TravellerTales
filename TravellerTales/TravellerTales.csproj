@@ -21,6 +21,7 @@
     <Resource Include="Assets\engine.png" />
     <Resource Include="Assets\credits.png" />
     <Resource Include="Assets\medical_scan.png" />
+    <Resource Include="Assets\homeworld.png" />
     <Resource Include="Assets\icon.ico" />
     <Resource Include="Assets\Characters\*.png" />
     <Resource Include="Assets\Fonts\*.ttf" />

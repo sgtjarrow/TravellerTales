@@ -68,7 +68,8 @@
         <Grid Width="1672"
               Height="941"
               Background="#05080F">
-            <Image Source="pack://application:,,,/Assets/medical_scan.png"
+            <Image x:Name="WizardBackgroundImage"
+                   Source="pack://application:,,,/Assets/medical_scan.png"
                    Stretch="Fill"
                    Opacity="0.88" />
 
@@ -151,30 +152,8 @@
                         <views:BiographyStepControl x:Name="BiographyStep"
                                                     Visibility="Visible" />
 
-                        <Border x:Name="HomeworldPlaceholder"
-                                Visibility="Collapsed"
-                                Background="#C006111E"
-                                BorderBrush="#5FD9FF"
-                                BorderThickness="1"
-                                Padding="42">
-                            <StackPanel HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
-                                <TextBlock Text="HOMEWORLD"
-                                           Style="{StaticResource AppTitleTextStyle}"
-                                           FontSize="46"
-                                           Foreground="#D8F8FF"
-                                           HorizontalAlignment="Center" />
-                                <TextBlock Text="This step will define birthplace, trade codes, education opportunities, and homeworld modifiers in a later slice."
-                                           Style="{StaticResource BodyTextStyle}"
-                                           FontSize="24"
-                                           LineHeight="34"
-                                           Foreground="#BEDFFF"
-                                           TextWrapping="Wrap"
-                                           TextAlignment="Center"
-                                           Width="920"
-                                           Margin="0,24,0,0" />
-                            </StackPanel>
-                        </Border>
+                        <views:HomeworldStepControl x:Name="HomeworldStep"
+                                                    Visibility="Collapsed" />
 
                         <Border x:Name="BackgroundSkillsPlaceholder"
                                 Visibility="Collapsed"

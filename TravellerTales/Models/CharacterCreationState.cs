@@ -4,4 +4,17 @@ public sealed class CharacterCreationState
 {
     public int CurrentStepIndex { get; set; }
     public Character Character { get; set; } = new();
+    public List<HomeworldCandidate> HomeworldCandidates { get; set; } = [];
+    public int? SelectedHomeworldCandidateIndex { get; set; }
+}
+
+public sealed class HomeworldCandidate
+{
+    public string Name { get; set; } = string.Empty;
+    public string Archetype { get; set; } = string.Empty;
+    public string Summary { get; set; } = string.Empty;
+    public int? WorldSizeValue { get; set; }
+    public int? AtmosphereValue { get; set; }
+    public string TemperatureKey { get; set; } = string.Empty;
+    public int? HydrographicsValue { get; set; }
 }
