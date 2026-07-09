@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using TravellerTales.Models;
 using TravellerTales.Services;
+using TravellerTales.Views;
 
 namespace TravellerTales;
 
@@ -49,7 +50,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (CharacterFileService.HasPausedCreation())
         {
-            var result = MessageBox.Show(
+            var result = ThemedDialog.Show(
                 this,
                 "Starting a new character will discard the current paused character creation save. This cannot be reversed.",
                 "Discard Paused Character",
@@ -166,7 +167,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception)
         {
-            MessageBox.Show(
+            ThemedDialog.Show(
                 this,
                 "The paused character creation save could not be loaded.",
                 "Continue Character",
@@ -198,7 +199,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (CharacterFileService.HasPausedCreation())
         {
-            var result = MessageBox.Show(
+            var result = ThemedDialog.Show(
                 this,
                 "A paused character creation save already exists. Saving now will overwrite it and cannot be reversed.",
                 "Overwrite Paused Character",
@@ -232,7 +233,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnCancelCharacterCreation(object sender, EventArgs e)
     {
-        var result = MessageBox.Show(
+        var result = ThemedDialog.Show(
             this,
             "Cancel character creation and discard all current character work?",
             "Cancel Character Creation",
@@ -297,7 +298,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnCancelSettings(object sender, RoutedEventArgs e)
     {
-        var result = MessageBox.Show(
+        var result = ThemedDialog.Show(
             this,
             "Discard all settings changes?",
             "Discard Changes",
