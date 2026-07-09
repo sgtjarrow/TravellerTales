@@ -27,15 +27,15 @@
         </Style>
 
         <Style x:Key="HomeworldUwpCodeButtonStyle" TargetType="Button">
-            <Setter Property="MinWidth" Value="44" />
+            <Setter Property="MinWidth" Value="20" />
             <Setter Property="Height" Value="38" />
-            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Margin" Value="1,0" />
             <Setter Property="Background" Value="#A0071523" />
             <Setter Property="BorderBrush" Value="#5FD9FF" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="#EAFBFF" />
             <Setter Property="FontFamily" Value="{StaticResource DataFieldFontFamily}" />
-            <Setter Property="FontSize" Value="23" />
+            <Setter Property="FontSize" Value="21" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
@@ -130,7 +130,11 @@
                                            Foreground="#9FEFFF"
                                            VerticalAlignment="Center" />
                                 <UniformGrid Grid.Column="2"
-                                             Columns="3">
+                                             Columns="9">
+                                    <Button x:Name="CandidateOneStarportCodeButton"
+                                            Tag="0|Starport"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
                                     <Button x:Name="CandidateOneWorldSizeCodeButton"
                                             Tag="0|WorldSize"
                                             Style="{StaticResource HomeworldUwpCodeButtonStyle}"
@@ -141,6 +145,29 @@
                                             Click="OnUwpCodeClicked" />
                                     <Button x:Name="CandidateOneHydrographicsCodeButton"
                                             Tag="0|Hydrographics"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateOnePopulationCodeButton"
+                                            Tag="0|Population"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateOneGovernmentCodeButton"
+                                            Tag="0|Government"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateOneLawLevelCodeButton"
+                                            Tag="0|LawLevel"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <TextBlock Text="-"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontFamily="{StaticResource DataFieldFontFamily}"
+                                               FontSize="23"
+                                               Foreground="#EAFBFF"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <Button x:Name="CandidateOneTechLevelCodeButton"
+                                            Tag="0|TechLevel"
                                             Style="{StaticResource HomeworldUwpCodeButtonStyle}"
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
@@ -182,7 +209,11 @@
                                            Foreground="#9FEFFF"
                                            VerticalAlignment="Center" />
                                 <UniformGrid Grid.Column="2"
-                                             Columns="3">
+                                             Columns="9">
+                                    <Button x:Name="CandidateTwoStarportCodeButton"
+                                            Tag="1|Starport"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
                                     <Button x:Name="CandidateTwoWorldSizeCodeButton"
                                             Tag="1|WorldSize"
                                             Style="{StaticResource HomeworldUwpCodeButtonStyle}"
@@ -193,6 +224,29 @@
                                             Click="OnUwpCodeClicked" />
                                     <Button x:Name="CandidateTwoHydrographicsCodeButton"
                                             Tag="1|Hydrographics"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateTwoPopulationCodeButton"
+                                            Tag="1|Population"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateTwoGovernmentCodeButton"
+                                            Tag="1|Government"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateTwoLawLevelCodeButton"
+                                            Tag="1|LawLevel"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <TextBlock Text="-"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontFamily="{StaticResource DataFieldFontFamily}"
+                                               FontSize="23"
+                                               Foreground="#EAFBFF"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <Button x:Name="CandidateTwoTechLevelCodeButton"
+                                            Tag="1|TechLevel"
                                             Style="{StaticResource HomeworldUwpCodeButtonStyle}"
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
@@ -234,7 +288,11 @@
                                            Foreground="#9FEFFF"
                                            VerticalAlignment="Center" />
                                 <UniformGrid Grid.Column="2"
-                                             Columns="3">
+                                             Columns="9">
+                                    <Button x:Name="CandidateThreeStarportCodeButton"
+                                            Tag="2|Starport"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
                                     <Button x:Name="CandidateThreeWorldSizeCodeButton"
                                             Tag="2|WorldSize"
                                             Style="{StaticResource HomeworldUwpCodeButtonStyle}"
@@ -245,6 +303,29 @@
                                             Click="OnUwpCodeClicked" />
                                     <Button x:Name="CandidateThreeHydrographicsCodeButton"
                                             Tag="2|Hydrographics"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateThreePopulationCodeButton"
+                                            Tag="2|Population"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateThreeGovernmentCodeButton"
+                                            Tag="2|Government"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <Button x:Name="CandidateThreeLawLevelCodeButton"
+                                            Tag="2|LawLevel"
+                                            Style="{StaticResource HomeworldUwpCodeButtonStyle}"
+                                            Click="OnUwpCodeClicked" />
+                                    <TextBlock Text="-"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               FontFamily="{StaticResource DataFieldFontFamily}"
+                                               FontSize="23"
+                                               Foreground="#EAFBFF"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <Button x:Name="CandidateThreeTechLevelCodeButton"
+                                            Tag="2|TechLevel"
                                             Style="{StaticResource HomeworldUwpCodeButtonStyle}"
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>

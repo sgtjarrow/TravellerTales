@@ -17,4 +17,11 @@ public sealed class HomeworldCandidate
     public int? AtmosphereValue { get; set; }
     public string TemperatureKey { get; set; } = string.Empty;
     public int? HydrographicsValue { get; set; }
+    public int? PopulationValue { get; set; }
+    public string? StarportCode { get; set; }
+    public List<int> CulturalTagValues { get; set; } = [];
+    public int? GovernmentValue { get; set; }
+    public int? LawLevelValue { get; set; }
+    public int? TechLevelValue { get; set; }
+    public List<HomeworldFaction>? Factions { get; set; }
 }

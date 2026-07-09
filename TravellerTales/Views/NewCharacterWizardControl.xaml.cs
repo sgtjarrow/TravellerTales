@@ -241,6 +241,13 @@ public partial class NewCharacterWizardControl : UserControl
         var atmosphere = AtmosphereCatalog.FromValue(character.Homeworld.AtmosphereValue);
         var temperature = TemperatureCatalog.FromKey(character.Homeworld.TemperatureKey);
         var hydrographics = HydrographicsCatalog.FromValue(character.Homeworld.HydrographicsValue);
+        var population = PopulationCatalog.FromValue(character.Homeworld.PopulationValue);
+        var starport = StarportCatalog.FromCode(character.Homeworld.StarportCode);
+        var government = GovernmentCatalog.FromValue(character.Homeworld.GovernmentValue);
+        var lawLevel = LawLevelCatalog.FromValue(character.Homeworld.LawLevelValue);
+        var techLevel = TechLevelCatalog.FromValue(character.Homeworld.TechLevelValue);
+        var culturalTags = FormatCulturalTags(character.Homeworld);
+        var factions = FormatFactions(character.Homeworld);
         ReviewIdentityText.Text =
             $"Name: {ValueOrPending(character.DisplayName)}\n" +
             $"Race: {character.Race}\n" +
@@ -250,10 +257,17 @@ public partial class NewCharacterWizardControl : UserControl
             $"Weight: {ValueOrPending(character.WeightPounds)} pounds / {character.WeightKilograms:0.00} kilograms\n" +
             $"Eye Color: {character.EyeColor}\n" +
             $"Homeworld: {ValueOrPending(character.Homeworld.Name)}\n" +
+            $"Homeworld Starport: {starport.Name} ({starport.Code})\n" +
             $"Homeworld Size: {worldSize.Name} ({worldSize.Code})\n" +
             $"Homeworld Atmosphere: {atmosphere.Name} ({atmosphere.Code})\n" +
             $"Homeworld Temperature: {temperature.Name}\n" +
             $"Homeworld Hydrographics: {hydrographics.Name} ({hydrographics.Code})\n" +
+            $"Homeworld Population: {population.Name} ({population.Code})\n" +
+            $"Homeworld Government: {government.Name} ({government.Code})\n" +
+            $"Homeworld Law Level: {lawLevel.Name} ({lawLevel.Code})\n" +
+            $"Homeworld Tech Level: {techLevel.Name} ({techLevel.Code})\n" +
+            $"Homeworld Cultural Tags: {culturalTags}\n" +
+            $"Homeworld Factions: {factions}\n" +
             $"Homeworld Notes: {ValueOrPending(character.Homeworld.Notes)}\n" +
             $"Description: {ValueOrPending(character.Description)}";
 
@@ -268,6 +282,32 @@ public partial class NewCharacterWizardControl : UserControl
     private static string ValueOrPending(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "Pending" : value;
+    }
+
+    private static string FormatCulturalTags(Homeworld homeworld)
+    {
+        if (homeworld.PopulationValue == 0 || homeworld.CulturalTagValues.Count == 0)
+        {
+            return "None";
+        }
+
+        return string.Join(", ", homeworld.CulturalTagValues.Select(value => CulturalTagCatalog.FromValue(value).Name));
+    }
+
+    private static string FormatFactions(Homeworld homeworld)
+    {
+        if (homeworld.Factions.Count == 0)
+        {
+            return "None";
+        }
+
+        return string.Join("; ", homeworld.Factions.Select(faction =>
+        {
+            var category = FactionCategoryCatalog.FromCode(faction.CategoryCode);
+            var strength = FactionStrengthCatalog.FromCode(faction.StrengthCode);
+
+            return $"{faction.Name}: {category.Name} ({category.Code}), {strength.Name} ({strength.Code})";
+        }));
     }
 
     private static string ValueOrPending(int value)

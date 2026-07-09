@@ -48,9 +48,9 @@ public partial class HomeworldStepControl : UserControl
         _candidateCards = [CandidateOneCard, CandidateTwoCard, CandidateThreeCard];
         _candidateCodeButtons =
         [
-            [CandidateOneWorldSizeCodeButton, CandidateOneAtmosphereCodeButton, CandidateOneHydrographicsCodeButton],
-            [CandidateTwoWorldSizeCodeButton, CandidateTwoAtmosphereCodeButton, CandidateTwoHydrographicsCodeButton],
-            [CandidateThreeWorldSizeCodeButton, CandidateThreeAtmosphereCodeButton, CandidateThreeHydrographicsCodeButton]
+            [CandidateOneStarportCodeButton, CandidateOneWorldSizeCodeButton, CandidateOneAtmosphereCodeButton, CandidateOneHydrographicsCodeButton, CandidateOnePopulationCodeButton, CandidateOneGovernmentCodeButton, CandidateOneLawLevelCodeButton, CandidateOneTechLevelCodeButton],
+            [CandidateTwoStarportCodeButton, CandidateTwoWorldSizeCodeButton, CandidateTwoAtmosphereCodeButton, CandidateTwoHydrographicsCodeButton, CandidateTwoPopulationCodeButton, CandidateTwoGovernmentCodeButton, CandidateTwoLawLevelCodeButton, CandidateTwoTechLevelCodeButton],
+            [CandidateThreeStarportCodeButton, CandidateThreeWorldSizeCodeButton, CandidateThreeAtmosphereCodeButton, CandidateThreeHydrographicsCodeButton, CandidateThreePopulationCodeButton, CandidateThreeGovernmentCodeButton, CandidateThreeLawLevelCodeButton, CandidateThreeTechLevelCodeButton]
         ];
         _candidateDetailTexts = [CandidateOneDetailText, CandidateTwoDetailText, CandidateThreeDetailText];
     }
@@ -65,7 +65,14 @@ public partial class HomeworldStepControl : UserControl
             _state.HomeworldCandidates.Any(candidate => !IsValidWorldSize(candidate.WorldSizeValue) ||
                                                         !IsValidAtmosphere(candidate.AtmosphereValue) ||
                                                         !IsValidTemperature(candidate.TemperatureKey) ||
-                                                        !IsValidHydrographics(candidate.HydrographicsValue)))
+                                                        !IsValidHydrographics(candidate.HydrographicsValue) ||
+                                                        !IsValidPopulation(candidate.PopulationValue) ||
+                                                        !IsValidStarport(candidate.StarportCode) ||
+                                                        !IsValidGovernment(candidate.GovernmentValue) ||
+                                                        !IsValidLawLevel(candidate.LawLevelValue) ||
+                                                        !IsValidTechLevel(candidate.TechLevelValue) ||
+                                                        !IsValidCulturalTags(candidate.PopulationValue, candidate.CulturalTagValues) ||
+                                                        !IsValidFactions(candidate.PopulationValue, candidate.GovernmentValue, candidate.Factions)))
         {
             _state.HomeworldCandidates = GenerateCandidates();
             _state.SelectedHomeworldCandidateIndex = null;
@@ -73,6 +80,13 @@ public partial class HomeworldStepControl : UserControl
             _state.Character.Homeworld.AtmosphereValue = 0;
             _state.Character.Homeworld.TemperatureKey = TemperatureCatalog.Swinging.Key;
             _state.Character.Homeworld.HydrographicsValue = 0;
+            _state.Character.Homeworld.PopulationValue = 0;
+            _state.Character.Homeworld.StarportCode = StarportCatalog.None.Code;
+            _state.Character.Homeworld.CulturalTagValues = [];
+            _state.Character.Homeworld.GovernmentValue = 0;
+            _state.Character.Homeworld.LawLevelValue = 0;
+            _state.Character.Homeworld.TechLevelValue = 0;
+            _state.Character.Homeworld.Factions = [];
         }
 
         if (_state.SelectedHomeworldCandidateIndex is < 0 or > 2)
@@ -224,11 +238,11 @@ public partial class HomeworldStepControl : UserControl
         for (var index = 0; index < _state.HomeworldCandidates.Count && index < _candidateCards.Length; index++)
         {
             var candidate = _state.HomeworldCandidates[index];
-            var uwp = GetCandidateUwp(candidate);
+            var uwpCodes = GetCandidateUwpCodes(candidate);
 
             for (var codeIndex = 0; codeIndex < _candidateCodeButtons[index].Length; codeIndex++)
             {
-                _candidateCodeButtons[index][codeIndex].Content = uwp[codeIndex].ToString();
+                _candidateCodeButtons[index][codeIndex].Content = uwpCodes[codeIndex];
             }
 
             UpdateCandidateDetail(index);
@@ -276,9 +290,14 @@ public partial class HomeworldStepControl : UserControl
         var candidate = _state.HomeworldCandidates[index];
         _candidateDetailTexts[index].Text = _candidateDetailAttributes[index] switch
         {
+            HomeworldDetailAttribute.Starport => BuildStarportDetail(candidate),
             HomeworldDetailAttribute.WorldSize => BuildWorldSizeDetail(candidate),
             HomeworldDetailAttribute.Atmosphere => BuildAtmosphereDetail(candidate),
             HomeworldDetailAttribute.Hydrographics => BuildHydrographicsDetail(candidate),
+            HomeworldDetailAttribute.Population => BuildPopulationDetail(candidate),
+            HomeworldDetailAttribute.Government => BuildGovernmentDetail(candidate),
+            HomeworldDetailAttribute.LawLevel => BuildLawLevelDetail(candidate),
+            HomeworldDetailAttribute.TechLevel => BuildTechLevelDetail(candidate),
             _ => BuildSummaryPlaceholder(candidate)
         };
     }
@@ -310,6 +329,23 @@ public partial class HomeworldStepControl : UserControl
                     candidate.WorldSizeValue.Value,
                     candidate.AtmosphereValue.Value,
                     candidate.TemperatureKey);
+                candidate.PopulationValue = HomeworldGenerator.GeneratePopulationValue(allowZero: false);
+                candidate.StarportCode = HomeworldGenerator.GenerateStarportCode(candidate.PopulationValue.Value);
+                candidate.CulturalTagValues = HomeworldGenerator.GenerateCulturalTagValues(candidate.PopulationValue.Value);
+                candidate.GovernmentValue = HomeworldGenerator.GenerateGovernmentValue(candidate.PopulationValue.Value);
+                candidate.LawLevelValue = HomeworldGenerator.GenerateLawLevelValue(
+                    candidate.PopulationValue.Value,
+                    candidate.GovernmentValue.Value);
+                candidate.TechLevelValue = HomeworldGenerator.GenerateTechLevelValue(
+                    candidate.StarportCode,
+                    candidate.WorldSizeValue.Value,
+                    candidate.AtmosphereValue.Value,
+                    candidate.HydrographicsValue.Value,
+                    candidate.PopulationValue.Value,
+                    candidate.GovernmentValue.Value);
+                candidate.Factions = HomeworldGenerator.GenerateFactions(
+                    candidate.PopulationValue.Value,
+                    candidate.GovernmentValue.Value);
                 return candidate;
             })
             .ToList();
@@ -335,18 +371,120 @@ public partial class HomeworldStepControl : UserControl
         return value is >= 0 and <= 10;
     }
 
+    private static bool IsValidPopulation(int? value)
+    {
+        return value is >= 0 and <= 12;
+    }
+
+    private static bool IsValidStarport(string? code)
+    {
+        return StarportCatalog.IsValidCode(code);
+    }
+
+    private static bool IsValidGovernment(int? value)
+    {
+        return value is >= 0 and <= 15;
+    }
+
+    private static bool IsValidLawLevel(int? value)
+    {
+        return value is >= 0 and <= 15;
+    }
+
+    private static bool IsValidTechLevel(int? value)
+    {
+        return value is >= 0 and <= 20;
+    }
+
+    private static bool IsValidCulturalTags(int? populationValue, List<int>? culturalTagValues)
+    {
+        if (!populationValue.HasValue || culturalTagValues is null)
+        {
+            return false;
+        }
+
+        if (populationValue.Value == 0)
+        {
+            return culturalTagValues.Count == 0;
+        }
+
+        return culturalTagValues.Count > 0 &&
+               culturalTagValues.Distinct().Count() == culturalTagValues.Count &&
+               culturalTagValues.All(CulturalTagCatalog.IsValidValue);
+    }
+
+    private static bool IsValidFactions(int? populationValue, int? governmentValue, List<HomeworldFaction>? factions)
+    {
+        if (!populationValue.HasValue || !governmentValue.HasValue || factions is null)
+        {
+            return false;
+        }
+
+        if (populationValue.Value < 1 || governmentValue.Value < 1)
+        {
+            return factions.Count == 0;
+        }
+
+        return factions.Count <= 4 &&
+               factions.All(faction =>
+                   !string.IsNullOrWhiteSpace(faction.Name) &&
+                   FactionCategoryCatalog.IsValidCode(faction.CategoryCode) &&
+                   FactionStrengthCatalog.IsValidCode(faction.StrengthCode));
+    }
+
     private static string GetCandidateUwp(HomeworldCandidate candidate)
     {
         return Homeworld.BuildUwp(
+            candidate.StarportCode,
             candidate.WorldSizeValue.GetValueOrDefault(),
             candidate.AtmosphereValue.GetValueOrDefault(),
-            candidate.HydrographicsValue.GetValueOrDefault());
+            candidate.HydrographicsValue.GetValueOrDefault(),
+            candidate.PopulationValue.GetValueOrDefault(),
+            candidate.GovernmentValue.GetValueOrDefault(),
+            candidate.LawLevelValue.GetValueOrDefault(),
+            candidate.TechLevelValue.GetValueOrDefault());
+    }
+
+    private static string[] GetCandidateUwpCodes(HomeworldCandidate candidate)
+    {
+        var starport = StarportCatalog.IsValidCode(candidate.StarportCode)
+            ? StarportCatalog.FromCode(candidate.StarportCode!)
+            : StarportCatalog.None;
+        var worldSize = WorldSizeCatalog.FromValue(candidate.WorldSizeValue.GetValueOrDefault());
+        var atmosphere = AtmosphereCatalog.FromValue(candidate.AtmosphereValue.GetValueOrDefault());
+        var hydrographics = HydrographicsCatalog.FromValue(candidate.HydrographicsValue.GetValueOrDefault());
+        var population = PopulationCatalog.FromValue(candidate.PopulationValue.GetValueOrDefault());
+        var government = GovernmentCatalog.FromValue(candidate.GovernmentValue.GetValueOrDefault());
+        var lawLevel = LawLevelCatalog.FromValue(candidate.LawLevelValue.GetValueOrDefault());
+        var techLevel = TechLevelCatalog.FromValue(candidate.TechLevelValue.GetValueOrDefault());
+
+        return
+        [
+            starport.Code,
+            worldSize.Code,
+            atmosphere.Code,
+            hydrographics.Code,
+            population.Code,
+            government.Code,
+            lawLevel.Code,
+            techLevel.Code
+        ];
     }
 
     private static string BuildSummaryPlaceholder(HomeworldCandidate candidate)
     {
         return "SUMMARY DATA PENDING\n" +
                "Generated profile values are available from the UWP codes above. Final homeworld summary text will be assembled after the remaining world attributes are generated.";
+    }
+
+    private static string BuildStarportDetail(HomeworldCandidate candidate)
+    {
+        var starport = StarportCatalog.FromCode(candidate.StarportCode ?? StarportCatalog.None.Code);
+
+        return $"STARPORT: {starport.Name} ({starport.Code})\n" +
+               $"BERTHING COST: {starport.BerthingCost}\n" +
+               $"FUEL: {starport.AvailableFuel}\n" +
+               $"FACILITIES: {starport.Facilities}";
     }
 
     private static string BuildWorldSizeDetail(HomeworldCandidate candidate)
@@ -373,6 +511,42 @@ public partial class HomeworldStepControl : UserControl
 
         return $"HYDROGRAPHICS: {hydrographics.Name} ({hydrographics.Code})\n" +
                $"COVERAGE: {hydrographics.Percentage}";
+    }
+
+    private static string BuildPopulationDetail(HomeworldCandidate candidate)
+    {
+        var population = PopulationCatalog.FromValue(candidate.PopulationValue.GetValueOrDefault());
+
+        return $"POPULATION: {population.Name} ({population.Code})\n" +
+               $"RANGE: {population.Range}";
+    }
+
+    private static string BuildGovernmentDetail(HomeworldCandidate candidate)
+    {
+        var government = GovernmentCatalog.FromValue(candidate.GovernmentValue.GetValueOrDefault());
+
+        return $"GOVERNMENT: {government.Name} ({government.Code})\n" +
+               $"DESCRIPTION: {government.Description}\n" +
+               $"EXAMPLES: {government.Examples}\n" +
+               $"CONTRABAND: {government.Contraband}";
+    }
+
+    private static string BuildLawLevelDetail(HomeworldCandidate candidate)
+    {
+        var lawLevel = LawLevelCatalog.FromValue(candidate.LawLevelValue.GetValueOrDefault());
+
+        return $"LAW LEVEL: {lawLevel.Name} ({lawLevel.Code})\n" +
+               $"BANNED WEAPONS: {lawLevel.BannedWeapons}\n" +
+               $"BANNED ARMOR: {lawLevel.BannedArmor}";
+    }
+
+    private static string BuildTechLevelDetail(HomeworldCandidate candidate)
+    {
+        var techLevel = TechLevelCatalog.FromValue(candidate.TechLevelValue.GetValueOrDefault());
+
+        return $"TECH LEVEL: {techLevel.Name} ({techLevel.Code})\n" +
+               $"ERA: {techLevel.Era}\n" +
+               $"DESCRIPTION: {techLevel.Description}";
     }
 
     private void CommitSelectedCandidateAttributes()
@@ -405,12 +579,55 @@ public partial class HomeworldStepControl : UserControl
         {
             _state.Character.Homeworld.HydrographicsValue = selectedCandidate.HydrographicsValue.Value;
         }
+
+        if (selectedCandidate.PopulationValue.HasValue)
+        {
+            _state.Character.Homeworld.PopulationValue = selectedCandidate.PopulationValue.Value;
+        }
+
+        if (StarportCatalog.IsValidCode(selectedCandidate.StarportCode))
+        {
+            _state.Character.Homeworld.StarportCode = StarportCatalog.FromCode(selectedCandidate.StarportCode!).Code;
+        }
+
+        _state.Character.Homeworld.CulturalTagValues = [.. selectedCandidate.CulturalTagValues];
+
+        if (selectedCandidate.GovernmentValue.HasValue)
+        {
+            _state.Character.Homeworld.GovernmentValue = selectedCandidate.GovernmentValue.Value;
+        }
+
+        if (selectedCandidate.LawLevelValue.HasValue)
+        {
+            _state.Character.Homeworld.LawLevelValue = selectedCandidate.LawLevelValue.Value;
+        }
+
+        if (selectedCandidate.TechLevelValue.HasValue)
+        {
+            _state.Character.Homeworld.TechLevelValue = selectedCandidate.TechLevelValue.Value;
+        }
+
+        _state.Character.Homeworld.Factions = selectedCandidate.Factions is null
+            ? []
+            : selectedCandidate.Factions
+                .Select(faction => new HomeworldFaction
+                {
+                    Name = faction.Name,
+                    CategoryCode = faction.CategoryCode,
+                    StrengthCode = faction.StrengthCode
+                })
+                .ToList();
     }
 
     private enum HomeworldDetailAttribute
     {
+        Starport,
         WorldSize,
         Atmosphere,
-        Hydrographics
+        Hydrographics,
+        Population,
+        Government,
+        LawLevel,
+        TechLevel
     }
 }
