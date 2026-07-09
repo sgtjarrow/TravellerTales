@@ -523,8 +523,7 @@ public partial class HomeworldStepControl : UserControl
 
     private static string BuildSummaryPlaceholder(HomeworldCandidate candidate)
     {
-        return "SUMMARY DATA PENDING\n" +
-               "Generated profile values are available from the UWP codes above. Final homeworld summary text will be assembled after the remaining world attributes are generated.";
+        return HomeworldCandidateSummaryGenerator.Generate(candidate);
     }
 
     private static string BuildStarportDetail(HomeworldCandidate candidate)

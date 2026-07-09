@@ -60,6 +60,56 @@
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="TextAlignment" Value="Center" />
         </Style>
+
+        <Style x:Key="ReviewTabControlStyle" TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style x:Key="ReviewTabItemStyle" TargetType="TabItem">
+            <Setter Property="Background" Value="#99071523" />
+            <Setter Property="BorderBrush" Value="#5FD9FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#BEDFFF" />
+            <Setter Property="FontFamily" Value="{StaticResource SectionHeaderFontFamily}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Padding" Value="24,9" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabHeaderBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Margin="{TemplateBinding Margin}">
+                            <ContentPresenter ContentSource="Header"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabHeaderBorder" Property="Background" Value="#DD0D2A3C" />
+                                <Setter TargetName="TabHeaderBorder" Property="BorderBrush" Value="#C9F5FF" />
+                                <Setter Property="Foreground" Value="#EAFBFF" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabHeaderBorder" Property="Background" Value="#CC12344A" />
+                                <Setter TargetName="TabHeaderBorder" Property="BorderBrush" Value="#C9F5FF" />
+                                <Setter Property="Foreground" Value="#EAFBFF" />
+                                <Setter Property="Panel.ZIndex" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Viewbox Stretch="UniformToFill"
@@ -212,52 +262,48 @@
                                 BorderThickness="1"
                                 Padding="42">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+                                <TabControl Margin="0"
+                                            Style="{StaticResource ReviewTabControlStyle}"
+                                            ItemContainerStyle="{StaticResource ReviewTabItemStyle}">
+                                    <TabItem Header="CHARACTER">
+                                        <ScrollViewer Padding="26"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Disabled">
+                                            <StackPanel>
+                                                <TextBlock Text="CHARACTER SHEET PREVIEW"
+                                                           Style="{StaticResource SectionHeaderTextStyle}"
+                                                           FontSize="28"
+                                                           Foreground="#9FEFFF"
+                                                           Margin="0,0,0,20" />
+                                                <TextBlock x:Name="ReviewIdentityText"
+                                                           Style="{StaticResource DataFieldTextStyle}"
+                                                           FontSize="24"
+                                                           Foreground="#EAFBFF"
+                                                           TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
 
-                                <TextBlock Text="REVIEW"
-                                           Style="{StaticResource AppTitleTextStyle}"
-                                           FontSize="46"
-                                           Foreground="#D8F8FF"
-                                           HorizontalAlignment="Center" />
-
-                                <Grid Grid.Row="1"
-                                      Margin="0,34,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="30" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel>
-                                        <TextBlock Text="CHARACTER SHEET PREVIEW"
-                                                   Style="{StaticResource SectionHeaderTextStyle}"
-                                                   FontSize="28"
-                                                   Foreground="#9FEFFF"
-                                                   Margin="0,0,0,20" />
-                                        <TextBlock x:Name="ReviewIdentityText"
-                                                   Style="{StaticResource DataFieldTextStyle}"
-                                                   FontSize="24"
-                                                   Foreground="#EAFBFF"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="CREATION LOG"
-                                                   Style="{StaticResource SectionHeaderTextStyle}"
-                                                   FontSize="28"
-                                                   Foreground="#9FEFFF"
-                                                   Margin="0,0,0,20" />
-                                        <TextBlock x:Name="ReviewMetadataText"
-                                                   Style="{StaticResource DataFieldTextStyle}"
-                                                   FontSize="21"
-                                                   LineHeight="30"
-                                                   Foreground="#EAFBFF"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </Grid>
+                                    <TabItem Header="LOG">
+                                        <ScrollViewer Padding="26"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Disabled">
+                                            <StackPanel>
+                                                <TextBlock Text="CREATION LOG"
+                                                           Style="{StaticResource SectionHeaderTextStyle}"
+                                                           FontSize="28"
+                                                           Foreground="#9FEFFF"
+                                                           Margin="0,0,0,20" />
+                                                <TextBlock x:Name="ReviewMetadataText"
+                                                           Style="{StaticResource DataFieldTextStyle}"
+                                                           FontSize="21"
+                                                           LineHeight="30"
+                                                           Foreground="#EAFBFF"
+                                                           TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
+                                </TabControl>
                             </Grid>
                         </Border>
                     </Grid>

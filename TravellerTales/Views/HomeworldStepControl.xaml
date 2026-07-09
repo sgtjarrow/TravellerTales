@@ -172,13 +172,16 @@
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
                             </Grid>
-                            <TextBlock x:Name="CandidateOneDetailText"
-                                       Grid.Row="2"
-                                       Style="{StaticResource BodyTextStyle}"
-                                       FontSize="18"
-                                       LineHeight="25"
-                                       Foreground="#BEDFFF"
-                                       TextWrapping="Wrap" />
+                            <ScrollViewer Grid.Row="2"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <TextBlock x:Name="CandidateOneDetailText"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           FontSize="18"
+                                           LineHeight="25"
+                                           Foreground="#BEDFFF"
+                                           TextWrapping="Wrap" />
+                            </ScrollViewer>
                         </Grid>
                     </Border>
 
@@ -251,13 +254,16 @@
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
                             </Grid>
-                            <TextBlock x:Name="CandidateTwoDetailText"
-                                       Grid.Row="2"
-                                       Style="{StaticResource BodyTextStyle}"
-                                       FontSize="18"
-                                       LineHeight="25"
-                                       Foreground="#BEDFFF"
-                                       TextWrapping="Wrap" />
+                            <ScrollViewer Grid.Row="2"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <TextBlock x:Name="CandidateTwoDetailText"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           FontSize="18"
+                                           LineHeight="25"
+                                           Foreground="#BEDFFF"
+                                           TextWrapping="Wrap" />
+                            </ScrollViewer>
                         </Grid>
                     </Border>
 
@@ -330,13 +336,16 @@
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
                             </Grid>
-                            <TextBlock x:Name="CandidateThreeDetailText"
-                                       Grid.Row="2"
-                                       Style="{StaticResource BodyTextStyle}"
-                                       FontSize="18"
-                                       LineHeight="25"
-                                       Foreground="#BEDFFF"
-                                       TextWrapping="Wrap" />
+                            <ScrollViewer Grid.Row="2"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <TextBlock x:Name="CandidateThreeDetailText"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           FontSize="18"
+                                           LineHeight="25"
+                                           Foreground="#BEDFFF"
+                                           TextWrapping="Wrap" />
+                            </ScrollViewer>
                         </Grid>
                     </Border>
                 </UniformGrid>

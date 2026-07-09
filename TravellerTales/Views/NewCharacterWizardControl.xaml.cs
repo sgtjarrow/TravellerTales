@@ -250,14 +250,17 @@ public partial class NewCharacterWizardControl : UserControl
         var culturalTags = FormatCulturalTags(character.Homeworld);
         var factions = FormatFactions(character.Homeworld);
         var bases = FormatBases(character.Homeworld);
+        var biographyAttributes = FormatBiographyAttributes(character);
         ReviewIdentityText.Text =
             $"Name: {ValueOrPending(character.DisplayName)}\n" +
-            $"Race: {character.Race}\n" +
-            $"Gender: {character.Gender}\n" +
+            $"Race: {FormatEnum(character.Race)}\n" +
+            $"Gender: {FormatEnum(character.Gender)}\n" +
             $"Age: {ValueOrPending(character.Age)}\n" +
             $"Height: {ValueOrPending(character.HeightInches)} inches / {character.HeightMeters:0.00} meters\n" +
             $"Weight: {ValueOrPending(character.WeightPounds)} pounds / {character.WeightKilograms:0.00} kilograms\n" +
-            $"Eye Color: {character.EyeColor}\n" +
+            $"Eye Color: {FormatEnum(character.EyeColor)}\n" +
+            biographyAttributes +
+            "\n" +
             $"Homeworld: {ValueOrPending(character.Homeworld.Name)}\n" +
             $"Homeworld Starport: {starport.Name} ({starport.Code})\n" +
             $"Homeworld Size: {worldSize.Name} ({worldSize.Code})\n" +
@@ -289,6 +292,58 @@ public partial class NewCharacterWizardControl : UserControl
     private static string ValueOrPending(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "Pending" : value;
+    }
+
+    private static string FormatBiographyAttributes(Character character)
+    {
+        var lines = new List<string>();
+
+        if (character.Race == RaceType.Human)
+        {
+            if (character.Heritage.HasValue)
+            {
+                lines.Add($"Heritage: {FormatEnum(character.Heritage.Value)}");
+            }
+
+            lines.Add($"Skin Color: {FormatEnum(character.SkinColor)}");
+
+            if (character.HairColor.HasValue)
+            {
+                lines.Add($"Hair Color: {FormatEnum(character.HairColor.Value)}");
+            }
+        }
+        else
+        {
+            if (character.FurPattern.HasValue)
+            {
+                lines.Add($"Fur Pattern: {FormatEnum(character.FurPattern.Value)}");
+            }
+
+            if (character.FurPrimaryColor.HasValue)
+            {
+                lines.Add($"Fur Primary Color: {FormatEnum(character.FurPrimaryColor.Value)}");
+            }
+
+            if (character.FurSecondaryColor.HasValue)
+            {
+                lines.Add($"Fur Secondary Color: {FormatEnum(character.FurSecondaryColor.Value)}");
+            }
+        }
+
+        return lines.Count == 0
+            ? string.Empty
+            : string.Join('\n', lines) + "\n";
+    }
+
+    private static string FormatEnum<TEnum>(TEnum value)
+        where TEnum : struct, Enum
+    {
+        var text = value.ToString();
+
+        return string.Concat(text.Select((character, index) =>
+            index > 0 && char.IsUpper(character) && char.IsLower(text[index - 1])
+                ? $" {character}"
+                : character.ToString()));
     }
 
     private static string FormatCulturalTags(Homeworld homeworld)
