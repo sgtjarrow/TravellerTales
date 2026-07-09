@@ -210,8 +210,100 @@ public static class HomeworldGenerator
         return factions;
     }
 
+    public static HomeworldBases GenerateBases(
+        string? starportCode,
+        int populationValue,
+        int lawLevelValue,
+        int techLevelValue)
+    {
+        var starport = StarportCatalog.IsValidCode(starportCode)
+            ? StarportCatalog.FromCode(starportCode!)
+            : StarportCatalog.None;
+        var population = PopulationCatalog.FromValue(populationValue);
+        var lawLevel = LawLevelCatalog.FromValue(lawLevelValue);
+        var techLevel = TechLevelCatalog.FromValue(techLevelValue);
+        var bases = new HomeworldBases
+        {
+            HighPort = RollBaseExists(starport.HighportBaseChance, techLevel.HighportModifier + population.HighportModifier),
+            MilitaryBase = RollBaseExists(starport.MilitaryBaseChance),
+            NavalBase = RollBaseExists(starport.NavalBaseChance),
+            ScoutBase = RollBaseExists(starport.ScoutBaseChance),
+            CorsairBase = RollBaseExists(starport.CorsairBaseChance, lawLevel.CorsairBaseModifier)
+        };
+
+        bases.NavalDepot = bases.NavalBase &&
+                           populationValue >= 6 &&
+                           techLevelValue >= 10 &&
+                           Random.Shared.Next(100) < 50;
+        bases.ScoutWayStation = bases.ScoutBase &&
+                                populationValue <= 6 &&
+                                techLevelValue >= 10 &&
+                                Random.Shared.Next(100) < 50;
+
+        return bases;
+    }
+
+    public static int GenerateNumberOfGasGiants()
+    {
+        if (DiceRoller.Roll(2, 6) < 5)
+        {
+            return 0;
+        }
+
+        return DiceRoller.Roll(2, 6) switch
+        {
+            <= 3 => 1,
+            <= 5 => 2,
+            <= 7 => 3,
+            <= 10 => 4,
+            _ => 5
+        };
+    }
+
+    public static int GenerateNumberOfPlanetoidBelts(int numberOfGasGiants)
+    {
+        if (DiceRoller.Roll(2, 6, numberOfGasGiants) < 9)
+        {
+            return 0;
+        }
+
+        return DiceRoller.Roll(2, 6) switch
+        {
+            <= 8 => 1,
+            <= 11 => 2,
+            _ => 3
+        };
+    }
+
+    public static string GenerateTravelCode(int atmosphereValue, int governmentValue, int lawLevelValue)
+    {
+        var travelCode = TravelCodeCatalog.Green.Code;
+        var hasAmberTrigger = atmosphereValue >= 10 ||
+                              governmentValue is 0 or 7 or >= 10 ||
+                              lawLevelValue == 0 ||
+                              lawLevelValue >= 9;
+
+        if (hasAmberTrigger && Random.Shared.Next(100) < 90)
+        {
+            travelCode = TravelCodeCatalog.Amber.Code;
+        }
+
+        if (travelCode == TravelCodeCatalog.Amber.Code && Random.Shared.Next(100) < 5)
+        {
+            travelCode = TravelCodeCatalog.Red.Code;
+        }
+
+        return travelCode;
+    }
+
     private static int RollCulturalTagValue()
     {
         return (DiceRoller.Roll(6) * 10) + DiceRoller.Roll(6);
+    }
+
+    private static bool RollBaseExists(int baseChance, int modifier = 0)
+    {
+        return baseChance != StarportCatalog.NoChance &&
+               DiceRoller.Roll(2, 6, modifier) >= baseChance;
     }
 }

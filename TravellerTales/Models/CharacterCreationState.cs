@@ -23,5 +23,9 @@ public sealed class HomeworldCandidate
     public int? GovernmentValue { get; set; }
     public int? LawLevelValue { get; set; }
     public int? TechLevelValue { get; set; }
+    public int? NumberOfGasGiants { get; set; }
+    public int? NumberOfPlanetoidBelts { get; set; }
+    public string? TravelCode { get; set; }
     public List<HomeworldFaction>? Factions { get; set; }
+    public HomeworldBases? Bases { get; set; }
 }

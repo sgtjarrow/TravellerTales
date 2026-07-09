@@ -12,8 +12,12 @@ public partial class HomeworldStepControl : UserControl
     private static readonly Brush ValidBorderBrush = (Brush)new BrushConverter().ConvertFromString("#5FD9FF")!;
     private static readonly Brush InvalidBorderBrush = (Brush)new BrushConverter().ConvertFromString("#D93C3C")!;
     private static readonly Brush DefaultCardBackground = (Brush)new BrushConverter().ConvertFromString("#D006111E")!;
+    private static readonly Brush AmberCardBackground = (Brush)new BrushConverter().ConvertFromString("#D0443210")!;
+    private static readonly Brush RedCardBackground = (Brush)new BrushConverter().ConvertFromString("#D0441515")!;
     private static readonly Brush DefaultCardBorder = (Brush)new BrushConverter().ConvertFromString("#5FD9FF")!;
     private static readonly Brush SelectedCardBackground = (Brush)new BrushConverter().ConvertFromString("#DD1A5574")!;
+    private static readonly Brush SelectedAmberCardBackground = (Brush)new BrushConverter().ConvertFromString("#DD5A4418")!;
+    private static readonly Brush SelectedRedCardBackground = (Brush)new BrushConverter().ConvertFromString("#DD5A1F1F")!;
     private static readonly Brush SelectedCardBorder = (Brush)new BrushConverter().ConvertFromString("#C99A45")!;
     private static readonly Brush DefaultCodeBackground = (Brush)new BrushConverter().ConvertFromString("#A0071523")!;
     private static readonly Brush DefaultCodeBorder = (Brush)new BrushConverter().ConvertFromString("#5FD9FF")!;
@@ -71,8 +75,12 @@ public partial class HomeworldStepControl : UserControl
                                                         !IsValidGovernment(candidate.GovernmentValue) ||
                                                         !IsValidLawLevel(candidate.LawLevelValue) ||
                                                         !IsValidTechLevel(candidate.TechLevelValue) ||
+                                                        !IsValidGasGiants(candidate.NumberOfGasGiants) ||
+                                                        !IsValidPlanetoidBelts(candidate.NumberOfPlanetoidBelts) ||
+                                                        !IsValidTravelCode(candidate.TravelCode) ||
                                                         !IsValidCulturalTags(candidate.PopulationValue, candidate.CulturalTagValues) ||
-                                                        !IsValidFactions(candidate.PopulationValue, candidate.GovernmentValue, candidate.Factions)))
+                                                        !IsValidFactions(candidate.PopulationValue, candidate.GovernmentValue, candidate.Factions) ||
+                                                        !IsValidBases(candidate.Bases)))
         {
             _state.HomeworldCandidates = GenerateCandidates();
             _state.SelectedHomeworldCandidateIndex = null;
@@ -86,7 +94,11 @@ public partial class HomeworldStepControl : UserControl
             _state.Character.Homeworld.GovernmentValue = 0;
             _state.Character.Homeworld.LawLevelValue = 0;
             _state.Character.Homeworld.TechLevelValue = 0;
+            _state.Character.Homeworld.NumberOfGasGiants = 0;
+            _state.Character.Homeworld.NumberOfPlanetoidBelts = 0;
+            _state.Character.Homeworld.TravelCode = TravelCodeCatalog.Green.Code;
             _state.Character.Homeworld.Factions = [];
+            _state.Character.Homeworld.Bases = new();
         }
 
         if (_state.SelectedHomeworldCandidateIndex is < 0 or > 2)
@@ -256,7 +268,11 @@ public partial class HomeworldStepControl : UserControl
         for (var index = 0; index < _candidateCards.Length; index++)
         {
             var isSelected = _state.SelectedHomeworldCandidateIndex == index;
-            _candidateCards[index].Background = isSelected ? SelectedCardBackground : DefaultCardBackground;
+            var travelCode = index < _state.HomeworldCandidates.Count
+                ? _state.HomeworldCandidates[index].TravelCode
+                : TravelCodeCatalog.Green.Code;
+
+            _candidateCards[index].Background = GetCardBackground(travelCode, isSelected);
             _candidateCards[index].BorderBrush = isSelected ? SelectedCardBorder : DefaultCardBorder;
             _candidateCards[index].BorderThickness = isSelected ? new Thickness(2) : new Thickness(1);
         }
@@ -346,6 +362,18 @@ public partial class HomeworldStepControl : UserControl
                 candidate.Factions = HomeworldGenerator.GenerateFactions(
                     candidate.PopulationValue.Value,
                     candidate.GovernmentValue.Value);
+                candidate.Bases = HomeworldGenerator.GenerateBases(
+                    candidate.StarportCode,
+                    candidate.PopulationValue.Value,
+                    candidate.LawLevelValue.Value,
+                    candidate.TechLevelValue.Value);
+                candidate.NumberOfGasGiants = HomeworldGenerator.GenerateNumberOfGasGiants();
+                candidate.NumberOfPlanetoidBelts = HomeworldGenerator.GenerateNumberOfPlanetoidBelts(
+                    candidate.NumberOfGasGiants.Value);
+                candidate.TravelCode = HomeworldGenerator.GenerateTravelCode(
+                    candidate.AtmosphereValue.Value,
+                    candidate.GovernmentValue.Value,
+                    candidate.LawLevelValue.Value);
                 return candidate;
             })
             .ToList();
@@ -396,6 +424,21 @@ public partial class HomeworldStepControl : UserControl
         return value is >= 0 and <= 20;
     }
 
+    private static bool IsValidGasGiants(int? value)
+    {
+        return value is >= 0 and <= 5;
+    }
+
+    private static bool IsValidPlanetoidBelts(int? value)
+    {
+        return value is >= 0 and <= 3;
+    }
+
+    private static bool IsValidTravelCode(string? code)
+    {
+        return TravelCodeCatalog.IsValidCode(code);
+    }
+
     private static bool IsValidCulturalTags(int? populationValue, List<int>? culturalTagValues)
     {
         if (!populationValue.HasValue || culturalTagValues is null)
@@ -430,6 +473,13 @@ public partial class HomeworldStepControl : UserControl
                    !string.IsNullOrWhiteSpace(faction.Name) &&
                    FactionCategoryCatalog.IsValidCode(faction.CategoryCode) &&
                    FactionStrengthCatalog.IsValidCode(faction.StrengthCode));
+    }
+
+    private static bool IsValidBases(HomeworldBases? bases)
+    {
+        return bases is not null &&
+               (bases.NavalBase || !bases.NavalDepot) &&
+               (bases.ScoutBase || !bases.ScoutWayStation);
     }
 
     private static string GetCandidateUwp(HomeworldCandidate candidate)
@@ -607,6 +657,21 @@ public partial class HomeworldStepControl : UserControl
             _state.Character.Homeworld.TechLevelValue = selectedCandidate.TechLevelValue.Value;
         }
 
+        if (selectedCandidate.NumberOfGasGiants.HasValue)
+        {
+            _state.Character.Homeworld.NumberOfGasGiants = selectedCandidate.NumberOfGasGiants.Value;
+        }
+
+        if (selectedCandidate.NumberOfPlanetoidBelts.HasValue)
+        {
+            _state.Character.Homeworld.NumberOfPlanetoidBelts = selectedCandidate.NumberOfPlanetoidBelts.Value;
+        }
+
+        if (TravelCodeCatalog.IsValidCode(selectedCandidate.TravelCode))
+        {
+            _state.Character.Homeworld.TravelCode = TravelCodeCatalog.FromCode(selectedCandidate.TravelCode!).Code;
+        }
+
         _state.Character.Homeworld.Factions = selectedCandidate.Factions is null
             ? []
             : selectedCandidate.Factions
@@ -617,6 +682,40 @@ public partial class HomeworldStepControl : UserControl
                     StrengthCode = faction.StrengthCode
                 })
                 .ToList();
+        _state.Character.Homeworld.Bases = CopyBases(selectedCandidate.Bases);
+    }
+
+    private static HomeworldBases CopyBases(HomeworldBases? bases)
+    {
+        return bases is null
+            ? new()
+            : new HomeworldBases
+            {
+                HighPort = bases.HighPort,
+                MilitaryBase = bases.MilitaryBase,
+                NavalBase = bases.NavalBase,
+                NavalDepot = bases.NavalBase && bases.NavalDepot,
+                ScoutBase = bases.ScoutBase,
+                ScoutWayStation = bases.ScoutBase && bases.ScoutWayStation,
+                CorsairBase = bases.CorsairBase
+            };
+    }
+
+    private static Brush GetCardBackground(string? travelCode, bool isSelected)
+    {
+        if (!TravelCodeCatalog.IsValidCode(travelCode))
+        {
+            return isSelected ? SelectedCardBackground : DefaultCardBackground;
+        }
+
+        var normalizedCode = TravelCodeCatalog.FromCode(travelCode!).Code;
+
+        return normalizedCode switch
+        {
+            "A" => isSelected ? SelectedAmberCardBackground : AmberCardBackground,
+            "R" => isSelected ? SelectedRedCardBackground : RedCardBackground,
+            _ => isSelected ? SelectedCardBackground : DefaultCardBackground
+        };
     }
 
     private enum HomeworldDetailAttribute

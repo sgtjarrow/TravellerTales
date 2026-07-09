@@ -246,8 +246,10 @@ public partial class NewCharacterWizardControl : UserControl
         var government = GovernmentCatalog.FromValue(character.Homeworld.GovernmentValue);
         var lawLevel = LawLevelCatalog.FromValue(character.Homeworld.LawLevelValue);
         var techLevel = TechLevelCatalog.FromValue(character.Homeworld.TechLevelValue);
+        var travelCode = TravelCodeCatalog.FromCode(character.Homeworld.TravelCode);
         var culturalTags = FormatCulturalTags(character.Homeworld);
         var factions = FormatFactions(character.Homeworld);
+        var bases = FormatBases(character.Homeworld);
         ReviewIdentityText.Text =
             $"Name: {ValueOrPending(character.DisplayName)}\n" +
             $"Race: {character.Race}\n" +
@@ -266,8 +268,13 @@ public partial class NewCharacterWizardControl : UserControl
             $"Homeworld Government: {government.Name} ({government.Code})\n" +
             $"Homeworld Law Level: {lawLevel.Name} ({lawLevel.Code})\n" +
             $"Homeworld Tech Level: {techLevel.Name} ({techLevel.Code})\n" +
+            $"Homeworld Trade Classifications: {character.Homeworld.TradeClassifications}\n" +
+            $"Homeworld Travel Code: {travelCode.Name} ({travelCode.Code})\n" +
             $"Homeworld Cultural Tags: {culturalTags}\n" +
             $"Homeworld Factions: {factions}\n" +
+            $"Homeworld Bases: {bases}\n" +
+            $"Homeworld Gas Giants: {character.Homeworld.NumberOfGasGiants}\n" +
+            $"Homeworld Planetoid Belts: {character.Homeworld.NumberOfPlanetoidBelts}\n" +
             $"Homeworld Notes: {ValueOrPending(character.Homeworld.Notes)}\n" +
             $"Description: {ValueOrPending(character.Description)}";
 
@@ -308,6 +315,49 @@ public partial class NewCharacterWizardControl : UserControl
 
             return $"{faction.Name}: {category.Name} ({category.Code}), {strength.Name} ({strength.Code})";
         }));
+    }
+
+    private static string FormatBases(Homeworld homeworld)
+    {
+        var bases = homeworld.Bases ?? new HomeworldBases();
+        var baseNames = new List<string>();
+
+        if (bases.HighPort)
+        {
+            baseNames.Add("High Port");
+        }
+
+        if (bases.MilitaryBase)
+        {
+            baseNames.Add("Military Base");
+        }
+
+        if (bases.NavalBase)
+        {
+            baseNames.Add("Naval Base");
+        }
+
+        if (bases.NavalBase && bases.NavalDepot)
+        {
+            baseNames.Add("Naval Depot");
+        }
+
+        if (bases.ScoutBase)
+        {
+            baseNames.Add("Scout Base");
+        }
+
+        if (bases.ScoutBase && bases.ScoutWayStation)
+        {
+            baseNames.Add("Scout Way Station");
+        }
+
+        if (bases.CorsairBase)
+        {
+            baseNames.Add("Corsair Base");
+        }
+
+        return baseNames.Count == 0 ? "None" : string.Join(", ", baseNames);
     }
 
     private static string ValueOrPending(int value)

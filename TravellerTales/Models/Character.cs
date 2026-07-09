@@ -87,12 +87,38 @@ public sealed class Character
         Homeworld.GovernmentValue = Math.Clamp(Homeworld.GovernmentValue, 0, 15);
         Homeworld.LawLevelValue = Math.Clamp(Homeworld.LawLevelValue, 0, 15);
         Homeworld.TechLevelValue = Math.Clamp(Homeworld.TechLevelValue, 0, 20);
+        Homeworld.NumberOfGasGiants = Math.Clamp(Homeworld.NumberOfGasGiants, 0, 5);
+        Homeworld.NumberOfPlanetoidBelts = Math.Clamp(Homeworld.NumberOfPlanetoidBelts, 0, 3);
+        Homeworld.TravelCode = TravelCodeCatalog.IsValidCode(Homeworld.TravelCode)
+            ? TravelCodeCatalog.FromCode(Homeworld.TravelCode).Code
+            : TravelCodeCatalog.Green.Code;
         Homeworld.CulturalTagValues = (Homeworld.CulturalTagValues ?? [])
             .Where(CulturalTagCatalog.IsValidValue)
             .Distinct()
             .ToList();
         Homeworld.Factions = NormalizeFactions(Homeworld.PopulationValue, Homeworld.GovernmentValue, Homeworld.Factions);
+        Homeworld.Bases = NormalizeBases(Homeworld.Bases);
         ApplyLegacyNameIfNeeded();
+    }
+
+    private static HomeworldBases NormalizeBases(HomeworldBases? bases)
+    {
+        if (bases is null)
+        {
+            return new();
+        }
+
+        if (!bases.NavalBase)
+        {
+            bases.NavalDepot = false;
+        }
+
+        if (!bases.ScoutBase)
+        {
+            bases.ScoutWayStation = false;
+        }
+
+        return bases;
     }
 
     private static List<HomeworldFaction> NormalizeFactions(int populationValue, int governmentValue, List<HomeworldFaction>? factions)
@@ -255,10 +281,117 @@ public sealed class Homeworld
     public int GovernmentValue { get; set; }
     public int LawLevelValue { get; set; }
     public int TechLevelValue { get; set; }
+    public int NumberOfGasGiants { get; set; }
+    public int NumberOfPlanetoidBelts { get; set; }
+    public string TravelCode { get; set; } = TravelCodeCatalog.Green.Code;
     public List<HomeworldFaction> Factions { get; set; } = [];
+    public HomeworldBases Bases { get; set; } = new();
 
     [JsonIgnore]
     public string Uwp => BuildUwp(StarportCode, WorldSizeValue, AtmosphereValue, HydrographicsValue, PopulationValue, GovernmentValue, LawLevelValue, TechLevelValue);
+
+    [JsonIgnore]
+    public bool IsAgricultural => IsBetween(AtmosphereValue, 4, 9) &&
+                                  IsBetween(HydrographicsValue, 5, 8) &&
+                                  IsBetween(PopulationValue, 5, 7);
+
+    [JsonIgnore]
+    public bool IsAsteroid => WorldSizeValue == 0 &&
+                              AtmosphereValue == 0 &&
+                              HydrographicsValue == 0;
+
+    [JsonIgnore]
+    public bool IsBarren => PopulationValue == 0 &&
+                            GovernmentValue == 0 &&
+                            LawLevelValue == 0;
+
+    [JsonIgnore]
+    public bool IsDesert => IsBetween(AtmosphereValue, 2, 9) &&
+                            HydrographicsValue == 0;
+
+    [JsonIgnore]
+    public bool IsFluidOceans => AtmosphereValue >= 10 &&
+                                 HydrographicsValue >= 1;
+
+    [JsonIgnore]
+    public bool IsGarden => IsBetween(WorldSizeValue, 6, 8) &&
+                            IsIn(AtmosphereValue, 5, 6, 8) &&
+                            IsBetween(HydrographicsValue, 5, 7);
+
+    [JsonIgnore]
+    public bool IsHighPopulation => PopulationValue >= 9;
+
+    [JsonIgnore]
+    public bool IsHighTechnology => TechLevelValue >= 12;
+
+    [JsonIgnore]
+    public bool IsIceCapped => AtmosphereValue <= 1 &&
+                               HydrographicsValue >= 1;
+
+    [JsonIgnore]
+    public bool IsIndustrial => IsIn(AtmosphereValue, 0, 1, 2, 4, 7, 9, 10, 11, 12) &&
+                                PopulationValue >= 9;
+
+    [JsonIgnore]
+    public bool IsLowPopulation => IsBetween(PopulationValue, 1, 3);
+
+    [JsonIgnore]
+    public bool IsLowTechnology => PopulationValue >= 1 &&
+                                   TechLevelValue <= 5;
+
+    [JsonIgnore]
+    public bool IsNonAgricultural => AtmosphereValue <= 3 &&
+                                     HydrographicsValue <= 3 &&
+                                     PopulationValue >= 6;
+
+    [JsonIgnore]
+    public bool IsNonIndustrial => IsBetween(PopulationValue, 4, 6);
+
+    [JsonIgnore]
+    public bool IsPoor => IsBetween(AtmosphereValue, 2, 5) &&
+                          HydrographicsValue <= 3;
+
+    [JsonIgnore]
+    public bool IsRich => IsIn(AtmosphereValue, 6, 8) &&
+                          IsBetween(PopulationValue, 6, 8) &&
+                          IsBetween(GovernmentValue, 4, 9);
+
+    [JsonIgnore]
+    public bool IsVacuum => !IsAsteroid &&
+                            AtmosphereValue == 0;
+
+    [JsonIgnore]
+    public bool IsWaterWorld => HydrographicsValue == 10;
+
+    [JsonIgnore]
+    public string TradeClassifications
+    {
+        get
+        {
+            var tags = new List<string>();
+
+            if (IsAgricultural) tags.Add("Ag");
+            if (IsAsteroid) tags.Add("As");
+            if (IsBarren) tags.Add("Ba");
+            if (IsDesert) tags.Add("De");
+            if (IsFluidOceans) tags.Add("Fl");
+            if (IsGarden) tags.Add("Ga");
+            if (IsHighPopulation) tags.Add("Hi");
+            if (IsHighTechnology) tags.Add("Ht");
+            if (IsIceCapped) tags.Add("Ic");
+            if (IsIndustrial) tags.Add("In");
+            if (IsLowPopulation) tags.Add("Lo");
+            if (IsLowTechnology) tags.Add("Lt");
+            if (IsNonAgricultural) tags.Add("Na");
+            if (IsNonIndustrial) tags.Add("Ni");
+            if (IsPoor) tags.Add("Po");
+            if (IsRich) tags.Add("Ri");
+            if (IsVacuum) tags.Add("Va");
+            if (IsWaterWorld) tags.Add("Wa");
+
+            return tags.Count == 0 ? "None" : string.Join(", ", tags);
+        }
+    }
 
     public static string BuildUwp(string? starportCode, int worldSizeValue, int atmosphereValue, int hydrographicsValue, int populationValue, int governmentValue, int lawLevelValue, int techLevelValue)
     {
@@ -275,6 +408,16 @@ public sealed class Homeworld
 
         return $"{starport.Code}{worldSize.Code}{atmosphere.Code}{hydrographics.Code}{population.Code}{government.Code}{lawLevel.Code}-{techLevel.Code}";
     }
+
+    private static bool IsBetween(int value, int minimum, int maximum)
+    {
+        return value >= minimum && value <= maximum;
+    }
+
+    private static bool IsIn(int value, params int[] values)
+    {
+        return values.Contains(value);
+    }
 }
 
 public sealed class HomeworldFaction
@@ -282,6 +425,47 @@ public sealed class HomeworldFaction
     public string Name { get; set; } = string.Empty;
     public string CategoryCode { get; set; } = string.Empty;
     public string StrengthCode { get; set; } = string.Empty;
+}
+
+public sealed class HomeworldBases
+{
+    public bool HighPort { get; set; }
+    public bool MilitaryBase { get; set; }
+    public bool NavalBase { get; set; }
+    public bool NavalDepot { get; set; }
+    public bool ScoutBase { get; set; }
+    public bool ScoutWayStation { get; set; }
+    public bool CorsairBase { get; set; }
+}
+
+public sealed record TravelCodeDefinition(
+    string Name,
+    string Code);
+
+public static class TravelCodeCatalog
+{
+    public static readonly TravelCodeDefinition Green = new("Green", "G");
+    public static readonly TravelCodeDefinition Amber = new("Amber", "A");
+    public static readonly TravelCodeDefinition Red = new("Red", "R");
+
+    public static IReadOnlyList<TravelCodeDefinition> All { get; } =
+    [
+        Green,
+        Amber,
+        Red
+    ];
+
+    public static TravelCodeDefinition FromCode(string code)
+    {
+        return All.FirstOrDefault(travelCode => string.Equals(travelCode.Code, code, StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentException($"Unknown travel code: '{code}'.", nameof(code));
+    }
+
+    public static bool IsValidCode(string? code)
+    {
+        return !string.IsNullOrWhiteSpace(code) &&
+               All.Any(travelCode => string.Equals(travelCode.Code, code, StringComparison.OrdinalIgnoreCase));
+    }
 }
 
 public sealed record WorldSizeDefinition(
