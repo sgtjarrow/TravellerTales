@@ -38,6 +38,7 @@ public partial class NewCharacterWizardControl : UserControl
         InitializeComponent();
         BiographyStep.ValidityChanged += OnBiographyValidityChanged;
         HomeworldStep.ValidityChanged += OnHomeworldValidityChanged;
+        CharacteristicsStep.ValidityChanged += OnCharacteristicsValidityChanged;
     }
 
     public void LoadState(CharacterCreationState state)
@@ -48,6 +49,7 @@ public partial class NewCharacterWizardControl : UserControl
         BiographyStep.LoadCharacter(_state.Character);
         HomeworldStep.LoadState(_state);
         UpdateStep();
+        ResetCurrentStepView();
     }
 
     private void OnNext(object sender, RoutedEventArgs e)
@@ -60,6 +62,11 @@ public partial class NewCharacterWizardControl : UserControl
         }
 
         if (_state.CurrentStepIndex == 1 && !HomeworldStep.TryCommitRequired())
+        {
+            return;
+        }
+
+        if (_state.CurrentStepIndex == 2 && !CharacteristicsStep.TryCommitRequired())
         {
             return;
         }
@@ -79,6 +86,12 @@ public partial class NewCharacterWizardControl : UserControl
 
         var previousStepIndex = _state.CurrentStepIndex;
         _state.CurrentStepIndex++;
+
+        if (_state.CurrentStepIndex == 4)
+        {
+            _state.Character.CaptureFinalCharacteristics();
+            _state.Character.CreationMetadata.Status = CharacterCreationStatus.Complete;
+        }
 
         if (!TrySaveCheckpoint())
         {
@@ -116,6 +129,14 @@ public partial class NewCharacterWizardControl : UserControl
         }
     }
 
+    private void OnCharacteristicsValidityChanged(object? sender, EventArgs e)
+    {
+        if (_state.CurrentStepIndex == 2)
+        {
+            NextButton.IsEnabled = CharacteristicsStep.IsComplete();
+        }
+    }
+
     private void CaptureCurrentStep()
     {
         if (_state.CurrentStepIndex == 0)
@@ -125,6 +146,10 @@ public partial class NewCharacterWizardControl : UserControl
         else if (_state.CurrentStepIndex == 1)
         {
             HomeworldStep.CommitPartial();
+        }
+        else if (_state.CurrentStepIndex == 2)
+        {
+            CharacteristicsStep.CommitPartial();
         }
     }
 
@@ -167,9 +192,25 @@ public partial class NewCharacterWizardControl : UserControl
 
     private void UpdateStep()
     {
+        if (_state.CurrentStepIndex == 2)
+        {
+            CharacteristicsStep.LoadState(_state);
+        }
+        else if (_state.CurrentStepIndex == 4 &&
+                 HasCharacteristics(_state.Character.CurrentCharacteristics) &&
+                 !HasCharacteristics(_state.Character.FinalCharacteristics))
+        {
+            _state.Character.CaptureFinalCharacteristics();
+            _state.Character.CreationMetadata.Status = CharacterCreationStatus.Complete;
+        }
+        else if (_state.CurrentStepIndex == 4)
+        {
+            _state.Character.CreationMetadata.Status = CharacterCreationStatus.Complete;
+        }
+
         BiographyStep.Visibility = _state.CurrentStepIndex == 0 ? Visibility.Visible : Visibility.Collapsed;
         HomeworldStep.Visibility = _state.CurrentStepIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
-        CharacteristicsPlaceholder.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
+        CharacteristicsStep.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
         BackgroundSkillsPlaceholder.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
         ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
 
@@ -179,6 +220,7 @@ public partial class NewCharacterWizardControl : UserControl
         {
             0 => BiographyStep.IsComplete(),
             1 => HomeworldStep.IsComplete(),
+            2 => CharacteristicsStep.IsComplete(),
             _ => true
         };
         FooterMessageText.Text = string.Empty;
@@ -186,6 +228,36 @@ public partial class NewCharacterWizardControl : UserControl
         UpdateBackground();
         UpdateStepIndicators();
         UpdateReview();
+        ResetCurrentStepView();
+    }
+
+    private void ResetCurrentStepView()
+    {
+        switch (_state.CurrentStepIndex)
+        {
+            case 0:
+                BiographyStep.ResetView();
+                break;
+            case 1:
+                HomeworldStep.ResetView();
+                break;
+            case 2:
+                CharacteristicsStep.ResetView();
+                break;
+            case 4:
+                ResetReviewView();
+                break;
+        }
+    }
+
+    private void ResetReviewView()
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            ReviewTabControl.SelectedIndex = 0;
+            ReviewCharacterScrollViewer.ScrollToTop();
+            ReviewLogScrollViewer.ScrollToTop();
+        });
     }
 
     private void UpdateBackground()
@@ -260,8 +332,15 @@ public partial class NewCharacterWizardControl : UserControl
             $"Weight: {ValueOrPending(character.WeightPounds)} pounds / {character.WeightKilograms:0.00} kilograms\n" +
             $"Eye Color: {FormatEnum(character.EyeColor)}\n" +
             biographyAttributes +
+            $"Description: {ValueOrNone(character.Description)}\n" +
+            $"Character Notes: {ValueOrNone(character.Notes)}\n" +
+            "\n" +
+            FormatCharacteristicSection("Starting Characteristics", character.StartingCharacteristics) +
+            "\n" +
+            FormatCharacteristicSection("Final Characteristics", character.FinalCharacteristics) +
             "\n" +
             $"Homeworld: {ValueOrPending(character.Homeworld.Name)}\n" +
+            $"Homeworld UWP: {character.Homeworld.Uwp}\n" +
             $"Homeworld Starport: {starport.Name} ({starport.Code})\n" +
             $"Homeworld Size: {worldSize.Name} ({worldSize.Code})\n" +
             $"Homeworld Atmosphere: {atmosphere.Name} ({atmosphere.Code})\n" +
@@ -278,20 +357,63 @@ public partial class NewCharacterWizardControl : UserControl
             $"Homeworld Bases: {bases}\n" +
             $"Homeworld Gas Giants: {character.Homeworld.NumberOfGasGiants}\n" +
             $"Homeworld Planetoid Belts: {character.Homeworld.NumberOfPlanetoidBelts}\n" +
-            $"Homeworld Notes: {ValueOrPending(character.Homeworld.Notes)}\n" +
-            $"Description: {ValueOrPending(character.Description)}";
+            $"Homeworld Notes: {ValueOrNone(character.Homeworld.Notes)}";
 
         var metadata = character.CreationMetadata;
         ReviewMetadataText.Text =
             $"Started: {FormatDateTime(metadata.CreateStartDateTime)}\n" +
             $"Paused: {metadata.CreatePauseDateTimes.Count} time(s)\n" +
             $"Continued: {metadata.CreateContinueDateTimes.Count} time(s)\n" +
-            $"Finalized: {(metadata.CreateFinalizedDateTime.HasValue ? FormatDateTime(metadata.CreateFinalizedDateTime.Value) : "Pending")}";
+            $"Status: {FormatEnum(metadata.Status)}";
     }
 
     private static string ValueOrPending(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "Pending" : value;
+    }
+
+    private static string ValueOrNone(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "None" : value;
+    }
+
+    private static string FormatCharacteristicSection(string title, CharacteristicSet characteristics)
+    {
+        if (!HasCharacteristics(characteristics))
+        {
+            return $"{title}: Pending\n";
+        }
+
+        return
+            $"{title}\n" +
+            $"Strength: {FormatCharacteristicValue(characteristics.Strength)}\n" +
+            $"Dexterity: {FormatCharacteristicValue(characteristics.Dexterity)}\n" +
+            $"Endurance: {FormatCharacteristicValue(characteristics.Endurance)}\n" +
+            $"Intellect: {FormatCharacteristicValue(characteristics.Intellect)}\n" +
+            $"Education: {FormatCharacteristicValue(characteristics.Education)}\n" +
+            $"Social: {FormatCharacteristicValue(characteristics.Social)}\n";
+    }
+
+    private static string FormatCharacteristicValue(int value)
+    {
+        return $"{value} ({FormatSigned(CharacteristicRules.GetDiceModifier(value))})";
+    }
+
+    private static bool HasCharacteristics(CharacteristicSet characteristics)
+    {
+        return characteristics.Strength > 0 ||
+               characteristics.Dexterity > 0 ||
+               characteristics.Endurance > 0 ||
+               characteristics.Intellect > 0 ||
+               characteristics.Education > 0 ||
+               characteristics.Social > 0;
+    }
+
+    private static string FormatSigned(int value)
+    {
+        return value > 0
+            ? $"+{value}"
+            : value.ToString(CultureInfo.InvariantCulture);
     }
 
     private static string FormatBiographyAttributes(Character character)

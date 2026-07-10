@@ -44,6 +44,9 @@ public sealed class Character
     public string Notes { get; set; } = string.Empty;
     public string HomeworldId { get; set; } = string.Empty;
     public Homeworld Homeworld { get; set; } = new();
+    public CharacteristicSet StartingCharacteristics { get; set; } = new();
+    public CharacteristicSet CurrentCharacteristics { get; set; } = new();
+    public CharacteristicSet FinalCharacteristics { get; set; } = new();
     public CharacterCreationMetadata CreationMetadata { get; set; } = new();
 
     [JsonIgnore]
@@ -71,6 +74,7 @@ public sealed class Character
 
     public void NormalizeAfterLoad()
     {
+        CreationMetadata ??= new();
         Homeworld ??= new();
         HomeworldId = string.IsNullOrWhiteSpace(HomeworldId) ? Homeworld.Id : HomeworldId;
         Homeworld.Id = string.IsNullOrWhiteSpace(Homeworld.Id) ? HomeworldId : Homeworld.Id;
@@ -98,7 +102,27 @@ public sealed class Character
             .ToList();
         Homeworld.Factions = NormalizeFactions(Homeworld.PopulationValue, Homeworld.GovernmentValue, Homeworld.Factions);
         Homeworld.Bases = NormalizeBases(Homeworld.Bases);
+        StartingCharacteristics = NormalizeCharacteristics(StartingCharacteristics);
+        CurrentCharacteristics = NormalizeCharacteristics(CurrentCharacteristics);
+        FinalCharacteristics = NormalizeCharacteristics(FinalCharacteristics);
         ApplyLegacyNameIfNeeded();
+    }
+
+    public void CaptureFinalCharacteristics()
+    {
+        FinalCharacteristics = CurrentCharacteristics.Clone();
+    }
+
+    private static CharacteristicSet NormalizeCharacteristics(CharacteristicSet? characteristics)
+    {
+        characteristics ??= new();
+        characteristics.Strength = Math.Clamp(characteristics.Strength, 0, 15);
+        characteristics.Dexterity = Math.Clamp(characteristics.Dexterity, 0, 15);
+        characteristics.Endurance = Math.Clamp(characteristics.Endurance, 0, 15);
+        characteristics.Intellect = Math.Clamp(characteristics.Intellect, 0, 15);
+        characteristics.Education = Math.Clamp(characteristics.Education, 0, 15);
+        characteristics.Social = Math.Clamp(characteristics.Social, 0, 15);
+        return characteristics;
     }
 
     private static HomeworldBases NormalizeBases(HomeworldBases? bases)
@@ -263,6 +287,29 @@ public sealed class Character
         }
 
         return builder.ToString();
+    }
+}
+
+public sealed class CharacteristicSet
+{
+    public int Strength { get; set; }
+    public int Dexterity { get; set; }
+    public int Endurance { get; set; }
+    public int Intellect { get; set; }
+    public int Education { get; set; }
+    public int Social { get; set; }
+
+    public CharacteristicSet Clone()
+    {
+        return new()
+        {
+            Strength = Strength,
+            Dexterity = Dexterity,
+            Endurance = Endurance,
+            Intellect = Intellect,
+            Education = Education,
+            Social = Social
+        };
     }
 }
 
@@ -1288,6 +1335,14 @@ public sealed class CharacterCreationMetadata
     public List<DateTime> CreatePauseDateTimes { get; set; } = [];
     public List<DateTime> CreateContinueDateTimes { get; set; } = [];
     public DateTime? CreateFinalizedDateTime { get; set; }
+    public CharacterCreationStatus Status { get; set; } = CharacterCreationStatus.InProgress;
+}
+
+public enum CharacterCreationStatus
+{
+    InProgress,
+    Paused,
+    Complete
 }
 
 public enum RaceType

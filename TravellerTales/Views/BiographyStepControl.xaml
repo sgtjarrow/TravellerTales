@@ -183,7 +183,8 @@
                     BorderBrush="#5FD9FF"
                     BorderThickness="1"
                     Padding="26">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                <ScrollViewer x:Name="BiographyFormScrollViewer"
+                              VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                 <Grid Margin="0,0,14,0">
                     <Grid.ColumnDefinitions>

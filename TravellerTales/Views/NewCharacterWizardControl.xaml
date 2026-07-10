@@ -205,6 +205,9 @@
                         <views:HomeworldStepControl x:Name="HomeworldStep"
                                                     Visibility="Collapsed" />
 
+                        <views:CharacteristicsStepControl x:Name="CharacteristicsStep"
+                                                          Visibility="Collapsed" />
+
                         <Border x:Name="BackgroundSkillsPlaceholder"
                                 Visibility="Collapsed"
                                 Background="#C006111E"
@@ -230,31 +233,6 @@
                             </StackPanel>
                         </Border>
 
-                        <Border x:Name="CharacteristicsPlaceholder"
-                                Visibility="Collapsed"
-                                Background="#C006111E"
-                                BorderBrush="#5FD9FF"
-                                BorderThickness="1"
-                                Padding="42">
-                            <StackPanel HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
-                                <TextBlock Text="CHARACTERISTICS"
-                                           Style="{StaticResource AppTitleTextStyle}"
-                                           FontSize="46"
-                                           Foreground="#D8F8FF"
-                                           HorizontalAlignment="Center" />
-                                <TextBlock Text="This step will define core characteristics in a later slice."
-                                           Style="{StaticResource BodyTextStyle}"
-                                           FontSize="24"
-                                           LineHeight="34"
-                                           Foreground="#BEDFFF"
-                                           TextWrapping="Wrap"
-                                           TextAlignment="Center"
-                                           Width="920"
-                                           Margin="0,24,0,0" />
-                            </StackPanel>
-                        </Border>
-
                         <Border x:Name="ReviewPlaceholder"
                                 Visibility="Collapsed"
                                 Background="#C006111E"
@@ -262,11 +240,13 @@
                                 BorderThickness="1"
                                 Padding="42">
                             <Grid>
-                                <TabControl Margin="0"
+                                <TabControl x:Name="ReviewTabControl"
+                                            Margin="0"
                                             Style="{StaticResource ReviewTabControlStyle}"
                                             ItemContainerStyle="{StaticResource ReviewTabItemStyle}">
                                     <TabItem Header="CHARACTER">
-                                        <ScrollViewer Padding="26"
+                                        <ScrollViewer x:Name="ReviewCharacterScrollViewer"
+                                                      Padding="26"
                                                       VerticalScrollBarVisibility="Auto"
                                                       HorizontalScrollBarVisibility="Disabled">
                                             <StackPanel>
@@ -285,7 +265,8 @@
                                     </TabItem>
 
                                     <TabItem Header="LOG">
-                                        <ScrollViewer Padding="26"
+                                        <ScrollViewer x:Name="ReviewLogScrollViewer"
+                                                      Padding="26"
                                                       VerticalScrollBarVisibility="Auto"
                                                       HorizontalScrollBarVisibility="Disabled">
                                             <StackPanel>

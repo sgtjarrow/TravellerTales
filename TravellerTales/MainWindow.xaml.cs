@@ -143,7 +143,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 CreationMetadata = new CharacterCreationMetadata
                 {
-                    CreateStartDateTime = DateTime.Now
+                    CreateStartDateTime = DateTime.Now,
+                    Status = CharacterCreationStatus.InProgress
                 }
             }
         };
@@ -184,6 +185,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         state.Character.CreationMetadata.CreateContinueDateTimes.Add(DateTime.Now);
+        state.Character.CreationMetadata.Status = CharacterCreationStatus.InProgress;
         CharacterFileService.SavePausedCreation(state);
         NewCharacterWizard.LoadState(state);
 
@@ -213,6 +215,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         state.Character.CreationMetadata.CreatePauseDateTimes.Add(DateTime.Now);
+        state.Character.CreationMetadata.Status = CharacterCreationStatus.Paused;
         CharacterFileService.SavePausedCreation(state);
         ShowLanding();
     }

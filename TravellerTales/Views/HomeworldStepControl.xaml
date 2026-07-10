@@ -172,7 +172,8 @@
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
                             </Grid>
-                            <ScrollViewer Grid.Row="2"
+                            <ScrollViewer x:Name="CandidateOneDetailScrollViewer"
+                                          Grid.Row="2"
                                           VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled">
                                 <TextBlock x:Name="CandidateOneDetailText"
@@ -254,7 +255,8 @@
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
                             </Grid>
-                            <ScrollViewer Grid.Row="2"
+                            <ScrollViewer x:Name="CandidateTwoDetailScrollViewer"
+                                          Grid.Row="2"
                                           VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled">
                                 <TextBlock x:Name="CandidateTwoDetailText"
@@ -336,7 +338,8 @@
                                             Click="OnUwpCodeClicked" />
                                 </UniformGrid>
                             </Grid>
-                            <ScrollViewer Grid.Row="2"
+                            <ScrollViewer x:Name="CandidateThreeDetailScrollViewer"
+                                          Grid.Row="2"
                                           VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled">
                                 <TextBlock x:Name="CandidateThreeDetailText"

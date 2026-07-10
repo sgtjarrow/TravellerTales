@@ -6,6 +6,17 @@ public sealed class CharacterCreationState
     public Character Character { get; set; } = new();
     public List<HomeworldCandidate> HomeworldCandidates { get; set; } = [];
     public int? SelectedHomeworldCandidateIndex { get; set; }
+    public CharacteristicAssignmentState? CharacteristicAssignment { get; set; }
+}
+
+public sealed class CharacteristicAssignmentState
+{
+    public int StrengthBase { get; set; }
+    public int DexterityBase { get; set; }
+    public int EnduranceBase { get; set; }
+    public int IntellectBase { get; set; }
+    public int EducationBase { get; set; }
+    public int SocialBase { get; set; }
 }
 
 public sealed class HomeworldCandidate

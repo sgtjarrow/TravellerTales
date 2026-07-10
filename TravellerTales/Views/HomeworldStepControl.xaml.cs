@@ -134,6 +134,16 @@ public partial class HomeworldStepControl : UserControl
         return Validate(showMessage: false);
     }
 
+    public void ResetView()
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            CandidateOneDetailScrollViewer.ScrollToTop();
+            CandidateTwoDetailScrollViewer.ScrollToTop();
+            CandidateThreeDetailScrollViewer.ScrollToTop();
+        });
+    }
+
     public void SetValidationMessage(string message)
     {
         ValidationMessage.Text = message;

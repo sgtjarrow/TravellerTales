@@ -132,6 +132,14 @@ public partial class BiographyStepControl : UserControl
         return Validate(showMessage: false);
     }
 
+    public void ResetView()
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            BiographyFormScrollViewer.ScrollToTop();
+        });
+    }
+
     private void CaptureFields()
     {
         CaptureNameFields(_character);
@@ -530,7 +538,9 @@ public partial class BiographyStepControl : UserControl
 
         if (FurPrimaryColorComboBox.SelectedItem is null)
         {
-            FurPrimaryColorComboBox.SelectedItem = FurColorType.Brown;
+            FurPrimaryColorComboBox.SelectedItem = RaceComboBox.SelectedItem is RaceType.Aslan
+                ? FurColorType.LightBrown
+                : FurColorType.Brown;
         }
 
         if (FurPatternComboBox.SelectedItem is FurPatternType.Solid)
