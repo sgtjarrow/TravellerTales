@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using TravellerTales.Services;
 
 namespace TravellerTales.Models;
 
@@ -47,6 +48,7 @@ public sealed class Character
     public CharacteristicSet StartingCharacteristics { get; set; } = new();
     public CharacteristicSet CurrentCharacteristics { get; set; } = new();
     public CharacteristicSet FinalCharacteristics { get; set; } = new();
+    public CharacterSkillSet Skills { get; set; } = new();
     public CharacterCreationMetadata CreationMetadata { get; set; } = new();
 
     [JsonIgnore]
@@ -105,6 +107,7 @@ public sealed class Character
         StartingCharacteristics = NormalizeCharacteristics(StartingCharacteristics);
         CurrentCharacteristics = NormalizeCharacteristics(CurrentCharacteristics);
         FinalCharacteristics = NormalizeCharacteristics(FinalCharacteristics);
+        Skills = SkillAdjustmentService.NormalizeSkillSet(Skills);
         ApplyLegacyNameIfNeeded();
     }
 

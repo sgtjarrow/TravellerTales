@@ -208,30 +208,8 @@
                         <views:CharacteristicsStepControl x:Name="CharacteristicsStep"
                                                           Visibility="Collapsed" />
 
-                        <Border x:Name="BackgroundSkillsPlaceholder"
-                                Visibility="Collapsed"
-                                Background="#C006111E"
-                                BorderBrush="#5FD9FF"
-                                BorderThickness="1"
-                                Padding="42">
-                            <StackPanel HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
-                                <TextBlock Text="BACKGROUND SKILLS"
-                                           Style="{StaticResource AppTitleTextStyle}"
-                                           FontSize="46"
-                                           Foreground="#D8F8FF"
-                                           HorizontalAlignment="Center" />
-                                <TextBlock Text="This step will assign early life and background skill choices in a later slice."
-                                           Style="{StaticResource BodyTextStyle}"
-                                           FontSize="24"
-                                           LineHeight="34"
-                                           Foreground="#BEDFFF"
-                                           TextWrapping="Wrap"
-                                           TextAlignment="Center"
-                                           Width="920"
-                                           Margin="0,24,0,0" />
-                            </StackPanel>
-                        </Border>
+                        <views:BackgroundSkillsStepControl x:Name="BackgroundSkillsStep"
+                                                           Visibility="Collapsed" />
 
                         <Border x:Name="ReviewPlaceholder"
                                 Visibility="Collapsed"

@@ -31,6 +31,7 @@ public partial class NewCharacterWizardControl : UserControl
 
     public event EventHandler<CharacterCreationState>? SaveRequested;
     public event EventHandler<CharacterCreationCheckpointEventArgs>? CheckpointSaveRequested;
+    public event EventHandler<CharacterCreationCompleteEventArgs>? CompleteRequested;
     public event EventHandler? CancelRequested;
 
     public NewCharacterWizardControl()
@@ -39,6 +40,7 @@ public partial class NewCharacterWizardControl : UserControl
         BiographyStep.ValidityChanged += OnBiographyValidityChanged;
         HomeworldStep.ValidityChanged += OnHomeworldValidityChanged;
         CharacteristicsStep.ValidityChanged += OnCharacteristicsValidityChanged;
+        BackgroundSkillsStep.ValidityChanged += OnBackgroundSkillsValidityChanged;
     }
 
     public void LoadState(CharacterCreationState state)
@@ -46,6 +48,7 @@ public partial class NewCharacterWizardControl : UserControl
         _state = state;
         _state.CurrentStepIndex = Math.Clamp(_state.CurrentStepIndex, 0, StepNames.Length - 1);
         _state.Character.Homeworld ??= new();
+        _state.BackgroundSkills ??= new();
         BiographyStep.LoadCharacter(_state.Character);
         HomeworldStep.LoadState(_state);
         UpdateStep();
@@ -71,16 +74,33 @@ public partial class NewCharacterWizardControl : UserControl
             return;
         }
 
-        CaptureCurrentStep();
-
-        if (_state.CurrentStepIndex == 1 && !TrySaveHomeworld())
+        if (_state.CurrentStepIndex == 3 && !BackgroundSkillsStep.TryCommitRequired())
         {
             return;
         }
 
+        CaptureCurrentStep();
+
         if (_state.CurrentStepIndex >= StepNames.Length - 1)
         {
-            FooterMessageText.Text = "Final character completion will be added with the Review step implementation.";
+            var creationCapViolations = SkillAdjustmentService.GetCreationCapViolations(_state.Character);
+            if (creationCapViolations.Count > 0)
+            {
+                FooterMessageText.Text =
+                    "A character cannot be completed with Skills or Specialties above 4: " +
+                    string.Join(", ", creationCapViolations);
+                return;
+            }
+
+            var completeEventArgs = new CharacterCreationCompleteEventArgs(_state);
+            CompleteRequested?.Invoke(this, completeEventArgs);
+            if (!completeEventArgs.Succeeded)
+            {
+                FooterMessageText.Text = string.IsNullOrWhiteSpace(completeEventArgs.ErrorMessage)
+                    ? "The character could not be completed. Stay on this step and try again."
+                    : completeEventArgs.ErrorMessage;
+            }
+
             return;
         }
 
@@ -90,7 +110,6 @@ public partial class NewCharacterWizardControl : UserControl
         if (_state.CurrentStepIndex == 4)
         {
             _state.Character.CaptureFinalCharacteristics();
-            _state.Character.CreationMetadata.Status = CharacterCreationStatus.Complete;
         }
 
         if (!TrySaveCheckpoint())
@@ -137,6 +156,14 @@ public partial class NewCharacterWizardControl : UserControl
         }
     }
 
+    private void OnBackgroundSkillsValidityChanged(object? sender, EventArgs e)
+    {
+        if (_state.CurrentStepIndex == 3)
+        {
+            NextButton.IsEnabled = BackgroundSkillsStep.IsComplete();
+        }
+    }
+
     private void CaptureCurrentStep()
     {
         if (_state.CurrentStepIndex == 0)
@@ -169,49 +196,27 @@ public partial class NewCharacterWizardControl : UserControl
         return false;
     }
 
-    private bool TrySaveHomeworld()
-    {
-        try
-        {
-            var homeworld = _state.Character.Homeworld;
-            HomeworldFileService.SaveHomeworld(homeworld);
-            _state.Character.HomeworldId = homeworld.Id;
-            return true;
-        }
-        catch (InvalidOperationException exception)
-        {
-            HomeworldStep.SetValidationMessage(exception.Message);
-            return false;
-        }
-        catch (Exception)
-        {
-            HomeworldStep.SetValidationMessage("The Homeworld file could not be saved. Stay on this step and try again.");
-            return false;
-        }
-    }
-
     private void UpdateStep()
     {
         if (_state.CurrentStepIndex == 2)
         {
             CharacteristicsStep.LoadState(_state);
         }
+        else if (_state.CurrentStepIndex == 3)
+        {
+            BackgroundSkillsStep.LoadState(_state);
+        }
         else if (_state.CurrentStepIndex == 4 &&
                  HasCharacteristics(_state.Character.CurrentCharacteristics) &&
                  !HasCharacteristics(_state.Character.FinalCharacteristics))
         {
             _state.Character.CaptureFinalCharacteristics();
-            _state.Character.CreationMetadata.Status = CharacterCreationStatus.Complete;
-        }
-        else if (_state.CurrentStepIndex == 4)
-        {
-            _state.Character.CreationMetadata.Status = CharacterCreationStatus.Complete;
         }
 
         BiographyStep.Visibility = _state.CurrentStepIndex == 0 ? Visibility.Visible : Visibility.Collapsed;
         HomeworldStep.Visibility = _state.CurrentStepIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
         CharacteristicsStep.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
-        BackgroundSkillsPlaceholder.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
+        BackgroundSkillsStep.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
         ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
 
         WizardStatusText.Text = $"Step {_state.CurrentStepIndex + 1} of {StepNames.Length}";
@@ -221,6 +226,7 @@ public partial class NewCharacterWizardControl : UserControl
             0 => BiographyStep.IsComplete(),
             1 => HomeworldStep.IsComplete(),
             2 => CharacteristicsStep.IsComplete(),
+            3 => BackgroundSkillsStep.IsComplete(),
             _ => true
         };
         FooterMessageText.Text = string.Empty;
@@ -339,6 +345,8 @@ public partial class NewCharacterWizardControl : UserControl
             "\n" +
             FormatCharacteristicSection("Final Characteristics", character.FinalCharacteristics) +
             "\n" +
+            FormatSkillSection(character) +
+            "\n" +
             $"Homeworld: {ValueOrPending(character.Homeworld.Name)}\n" +
             $"Homeworld UWP: {character.Homeworld.Uwp}\n" +
             $"Homeworld Starport: {starport.Name} ({starport.Code})\n" +
@@ -397,6 +405,45 @@ public partial class NewCharacterWizardControl : UserControl
     private static string FormatCharacteristicValue(int value)
     {
         return $"{value} ({FormatSigned(CharacteristicRules.GetDiceModifier(value))})";
+    }
+
+    private static string FormatSkillSection(Character character)
+    {
+        if (character.Skills.Skills.Count == 0)
+        {
+            return "Skills: None\n";
+        }
+
+        var catalog = SpecialtyCatalogService.LoadCatalog();
+        var lines = new List<string> { "Skills" };
+
+        foreach (var skill in character.Skills.Skills.OrderBy(skill => SkillCatalog.GetDisplayName(skill.SkillName)))
+        {
+            var skillName = SkillCatalog.GetDisplayName(skill.SkillName);
+            if (SkillCatalog.IsValueOnly(skill.SkillName))
+            {
+                lines.Add($"{skillName}: {skill.Value}");
+                continue;
+            }
+
+            if (skill.Specialties.Count == 0)
+            {
+                lines.Add($"{skillName}: 0");
+                continue;
+            }
+
+            foreach (var specialty in skill.Specialties.OrderByDescending(item => item.Value).ThenBy(item => FormatSpecialtyName(catalog, item.SpecialtyId)))
+            {
+                lines.Add($"{skillName} ({FormatSpecialtyName(catalog, specialty.SpecialtyId)}): {specialty.Value}");
+            }
+        }
+
+        return string.Join('\n', lines) + "\n";
+    }
+
+    private static string FormatSpecialtyName(SkillSpecialtyCatalog catalog, string specialtyId)
+    {
+        return catalog.FindById(specialtyId)?.DisplayName ?? specialtyId;
     }
 
     private static bool HasCharacteristics(CharacteristicSet characteristics)
@@ -551,6 +598,18 @@ public partial class NewCharacterWizardControl : UserControl
 public sealed class CharacterCreationCheckpointEventArgs : EventArgs
 {
     public CharacterCreationCheckpointEventArgs(CharacterCreationState state)
+    {
+        State = state;
+    }
+
+    public CharacterCreationState State { get; }
+    public bool Succeeded { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
+}
+
+public sealed class CharacterCreationCompleteEventArgs : EventArgs
+{
+    public CharacterCreationCompleteEventArgs(CharacterCreationState state)
     {
         State = state;
     }

@@ -12,11 +12,11 @@ public static class HomeworldFileService
         WriteIndented = true
     };
 
-    public static string SaveHomeworld(Homeworld homeworld)
+    public static string SaveHomeworld(Homeworld homeworld, IReadOnlySet<string>? referencedHomeworldIds = null)
     {
         Directory.CreateDirectory(AppPaths.HomeworldsDirectory);
 
-        if (HomeworldExists(homeworld.Name, homeworld.Id))
+        if (HomeworldExists(homeworld.Name, homeworld.Id, referencedHomeworldIds))
         {
             throw new InvalidOperationException("A Homeworld with this name already exists.");
         }
@@ -33,7 +33,10 @@ public static class HomeworldFileService
         return path;
     }
 
-    public static bool HomeworldExists(string name, string? allowedId = null)
+    public static bool HomeworldExists(
+        string name,
+        string? allowedId = null,
+        IReadOnlySet<string>? referencedHomeworldIds = null)
     {
         var sanitizedName = SanitizeHomeworldName(name);
 
@@ -55,7 +58,34 @@ public static class HomeworldFileService
         }
 
         var existing = LoadHomeworld(path);
+        if (referencedHomeworldIds is not null &&
+            existing is not null &&
+            !referencedHomeworldIds.Contains(existing.Id))
+        {
+            return false;
+        }
+
         return existing is null || !string.Equals(existing.Id, allowedId, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static OrphanedHomeworldDeleteResult DeleteOrphanedHomeworlds(IReadOnlySet<string> referencedHomeworldIds)
+    {
+        Directory.CreateDirectory(AppPaths.HomeworldsDirectory);
+        var deletedFiles = new List<string>();
+
+        foreach (var path in Directory.EnumerateFiles(AppPaths.HomeworldsDirectory, "*.json").ToList())
+        {
+            var homeworld = LoadHomeworld(path);
+            if (homeworld is null || referencedHomeworldIds.Contains(homeworld.Id))
+            {
+                continue;
+            }
+
+            File.Delete(path);
+            deletedFiles.Add(Path.GetFileName(path));
+        }
+
+        return new OrphanedHomeworldDeleteResult(deletedFiles.Count, deletedFiles);
     }
 
     public static string GetHomeworldPath(string name)
@@ -114,3 +144,5 @@ public static class HomeworldFileService
         }
     }
 }
+
+public sealed record OrphanedHomeworldDeleteResult(int DeletedCount, IReadOnlyList<string> DeletedFileNames);

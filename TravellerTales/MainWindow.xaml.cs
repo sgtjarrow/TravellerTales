@@ -234,6 +234,41 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private void OnCompleteCharacterCreation(object sender, CharacterCreationCompleteEventArgs e)
+    {
+        try
+        {
+            var character = e.State.Character;
+            character.CaptureFinalCharacteristics();
+            character.CreationMetadata.CreateFinalizedDateTime = DateTime.Now;
+            character.CreationMetadata.Status = CharacterCreationStatus.Complete;
+
+            if (CharacterFileService.FinalCharacterExists(character))
+            {
+                throw new InvalidOperationException("A Character with this name already exists.");
+            }
+
+            var referencedHomeworldIds = CharacterFileService.GetReferencedFinalHomeworldIds();
+            HomeworldFileService.SaveHomeworld(character.Homeworld, referencedHomeworldIds);
+            character.HomeworldId = character.Homeworld.Id;
+            CharacterFileService.SaveFinalCharacter(character);
+            CharacterFileService.DeletePausedCreation();
+
+            e.Succeeded = true;
+            ShowLanding();
+        }
+        catch (InvalidOperationException exception)
+        {
+            e.Succeeded = false;
+            e.ErrorMessage = exception.Message;
+        }
+        catch (Exception)
+        {
+            e.Succeeded = false;
+            e.ErrorMessage = "The character could not be completed. Stay on this step and try again.";
+        }
+    }
+
     private void OnCancelCharacterCreation(object sender, EventArgs e)
     {
         var result = ThemedDialog.Show(
@@ -250,6 +285,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         CharacterFileService.DeletePausedCreation();
         ShowLanding();
+    }
+
+    private void OnDeleteOrphanedHomeworlds(object sender, RoutedEventArgs e)
+    {
+        var result = ThemedDialog.Show(
+            this,
+            "Delete all saved Homeworld files that are not referenced by completed Characters? This cannot be reversed.",
+            "Delete Orphaned Homeworlds",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        try
+        {
+            var referencedHomeworldIds = CharacterFileService.GetReferencedFinalHomeworldIds();
+            var deleteResult = HomeworldFileService.DeleteOrphanedHomeworlds(referencedHomeworldIds);
+            SettingsValidationMessage.Text = deleteResult.DeletedCount == 0
+                ? "No orphaned Homeworlds found."
+                : $"Deleted {deleteResult.DeletedCount} orphaned Homeworld file(s).";
+        }
+        catch (Exception)
+        {
+            SettingsValidationMessage.Text = "Orphaned Homeworld cleanup could not be completed.";
+        }
     }
 
     private void OnSettingsValueChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

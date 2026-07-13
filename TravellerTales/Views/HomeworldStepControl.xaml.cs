@@ -182,7 +182,10 @@ public partial class HomeworldStepControl : UserControl
             return "Choose a Homeworld candidate.";
         }
 
-        if (HomeworldFileService.HomeworldExists(HomeworldNameTextBox.Text, _state.Character.Homeworld.Id))
+        if (HomeworldFileService.HomeworldExists(
+                HomeworldNameTextBox.Text,
+                _state.Character.Homeworld.Id,
+                CharacterFileService.GetReferencedFinalHomeworldIds()))
         {
             return "A Homeworld with this name already exists.";
         }

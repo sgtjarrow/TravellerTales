@@ -7,6 +7,20 @@ public sealed class CharacterCreationState
     public List<HomeworldCandidate> HomeworldCandidates { get; set; } = [];
     public int? SelectedHomeworldCandidateIndex { get; set; }
     public CharacteristicAssignmentState? CharacteristicAssignment { get; set; }
+    public BackgroundSkillsState BackgroundSkills { get; set; } = new();
+}
+
+public sealed class BackgroundSkillsState
+{
+    public List<BackgroundSkillSelection> Selections { get; set; } = [];
+    public bool Applied { get; set; }
+}
+
+public sealed class BackgroundSkillSelection
+{
+    public bool IsSelected { get; set; }
+    public SkillName SkillName { get; set; }
+    public string SpecialtyId { get; set; } = string.Empty;
 }
 
 public sealed class CharacteristicAssignmentState

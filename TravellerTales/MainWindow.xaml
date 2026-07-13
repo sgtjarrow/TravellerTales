@@ -58,13 +58,49 @@
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
-        <Style x:Key="SettingsButtonStyle" TargetType="Button" BasedOn="{StaticResource PlaceholderButtonStyle}">
+        <Style x:Key="SettingsButtonStyle" TargetType="Button">
             <Setter Property="MinWidth" Value="142" />
             <Setter Property="MinHeight" Value="42" />
+            <Setter Property="Padding" Value="22,8" />
             <Setter Property="Margin" Value="10,0" />
-            <Setter Property="Background" Value="#AA061521" />
+            <Setter Property="Background" Value="#CC061521" />
             <Setter Property="BorderBrush" Value="#8CE8FF" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Foreground" Value="#EAFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#DD0D2A3C" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#C9F5FF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#EE174A64" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#CCB32626" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#7A1E1E" />
+                                <Setter Property="Foreground" Value="#080A0E" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="SettingsInputStyle" TargetType="TextBox">
@@ -325,6 +361,7 @@
             <views:NewCharacterWizardControl x:Name="NewCharacterWizard"
                                              SaveRequested="OnSaveCharacterCreation"
                                              CheckpointSaveRequested="OnCheckpointSaveCharacterCreation"
+                                             CompleteRequested="OnCompleteCharacterCreation"
                                              CancelRequested="OnCancelCharacterCreation" />
         </Grid>
 
@@ -365,6 +402,8 @@
                                 <RowDefinition Height="24" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="24" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="34" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
@@ -409,6 +448,19 @@
                                            BasedOn="{StaticResource SettingsDatePickerTextBoxStyle}" />
                                 </DatePicker.Resources>
                             </DatePicker>
+
+                            <TextBlock Grid.Row="6"
+                                       Text="HOMEWORLD MAINTENANCE"
+                                       Style="{StaticResource SectionHeaderTextStyle}"
+                                       FontSize="24"
+                                       Foreground="#9FEFFF"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Row="6"
+                                    Grid.Column="1"
+                                    Content="Delete Orphaned Homeworlds"
+                                    Click="OnDeleteOrphanedHomeworlds"
+                                    AutomationProperties.Name="Delete Orphaned Homeworlds"
+                                    Style="{StaticResource SettingsButtonStyle}" />
                         </Grid>
 
                         <TextBlock x:Name="SettingsValidationMessage"

@@ -94,6 +94,52 @@ public static class CharacterFileService
         return !string.IsNullOrWhiteSpace(character.SanitizedDisplayName) &&
                File.Exists(GetFinalCharacterPath(character));
     }
+
+    public static string SaveFinalCharacter(Character character)
+    {
+        Directory.CreateDirectory(AppPaths.CharactersDirectory);
+
+        if (FinalCharacterExists(character))
+        {
+            throw new InvalidOperationException("A Character with this name already exists.");
+        }
+
+        var path = GetFinalCharacterPath(character);
+        var json = JsonSerializer.Serialize(character, JsonOptions);
+        File.WriteAllText(path, json);
+        return path;
+    }
+
+    public static IReadOnlySet<string> GetReferencedFinalHomeworldIds()
+    {
+        Directory.CreateDirectory(AppPaths.CharactersDirectory);
+        var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var path in Directory.EnumerateFiles(AppPaths.CharactersDirectory, "*.json"))
+        {
+            if (string.Equals(path, PausedCreationPath, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            try
+            {
+                var json = File.ReadAllText(path);
+                var character = JsonSerializer.Deserialize<Character>(json, JsonOptions);
+                if (character?.CreationMetadata?.Status == CharacterCreationStatus.Complete &&
+                    !string.IsNullOrWhiteSpace(character.HomeworldId))
+                {
+                    ids.Add(character.HomeworldId);
+                }
+            }
+            catch (Exception)
+            {
+                continue;
+            }
+        }
+
+        return ids;
+    }
 }
 
 public sealed class EyeColorTypeJsonConverter : JsonConverter<EyeColorType>
