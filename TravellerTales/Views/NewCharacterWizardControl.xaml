@@ -160,7 +160,7 @@
                     </Grid>
 
                     <UniformGrid Grid.Row="2"
-                                 Columns="5">
+                                 Columns="6">
                         <Border x:Name="BiographyStepIndicator"
                                 Height="62"
                                 Margin="5,0"
@@ -189,6 +189,13 @@
                             <TextBlock Text="BACKGROUND SKILLS"
                                        Style="{StaticResource StepTitleStyle}" />
                         </Border>
+                        <Border x:Name="CareerTermsStepIndicator"
+                                Height="62"
+                                Margin="5,0"
+                                BorderThickness="1">
+                            <TextBlock Text="CAREER TERMS"
+                                       Style="{StaticResource StepTitleStyle}" />
+                        </Border>
                         <Border x:Name="ReviewStepIndicator"
                                 Height="62"
                                 Margin="5,0"
@@ -210,6 +217,9 @@
 
                         <views:BackgroundSkillsStepControl x:Name="BackgroundSkillsStep"
                                                            Visibility="Collapsed" />
+
+                        <views:CareerTermsStepControl x:Name="CareerTermsStep"
+                                                      Visibility="Collapsed" />
 
                         <Border x:Name="ReviewPlaceholder"
                                 Visibility="Collapsed"
@@ -277,7 +287,8 @@
 
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Right">
-                            <Button Content="Save"
+                            <Button x:Name="SaveButton"
+                                    Content="Save"
                                     Click="OnSave"
                                     AutomationProperties.Name="Save Character Creation"
                                     Style="{StaticResource WizardButtonStyle}" />

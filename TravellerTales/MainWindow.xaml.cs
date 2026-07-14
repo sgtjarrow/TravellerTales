@@ -269,7 +269,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void OnCancelCharacterCreation(object sender, EventArgs e)
+    private void OnCancelCharacterCreation(object sender, CharacterCreationCancelEventArgs e)
     {
         var result = ThemedDialog.Show(
             this,
@@ -284,6 +284,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         CharacterFileService.DeletePausedCreation();
+        e.Cancelled = true;
         ShowLanding();
     }
 

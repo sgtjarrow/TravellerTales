@@ -49,6 +49,7 @@ public sealed class Character
     public CharacteristicSet CurrentCharacteristics { get; set; } = new();
     public CharacteristicSet FinalCharacteristics { get; set; } = new();
     public CharacterSkillSet Skills { get; set; } = new();
+    public CareerTermsState CareerTerms { get; set; } = new();
     public CharacterCreationMetadata CreationMetadata { get; set; } = new();
 
     [JsonIgnore]
@@ -108,6 +109,8 @@ public sealed class Character
         CurrentCharacteristics = NormalizeCharacteristics(CurrentCharacteristics);
         FinalCharacteristics = NormalizeCharacteristics(FinalCharacteristics);
         Skills = SkillAdjustmentService.NormalizeSkillSet(Skills);
+        CareerTerms ??= new();
+        CareerTermService.Normalize(CareerTerms);
         ApplyLegacyNameIfNeeded();
     }
 

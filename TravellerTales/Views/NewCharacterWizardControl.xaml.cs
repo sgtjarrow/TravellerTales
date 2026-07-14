@@ -16,12 +16,14 @@ public partial class NewCharacterWizardControl : UserControl
         "Homeworld",
         "Characteristics",
         "Background Skills",
+        "Career Terms",
         "Review"
     ];
     private static readonly string[] StepBackgroundAssetNames =
     [
         "medical_scan.png",
         "homeworld.png",
+        "medical_scan.png",
         "medical_scan.png",
         "medical_scan.png",
         "medical_scan.png"
@@ -32,7 +34,7 @@ public partial class NewCharacterWizardControl : UserControl
     public event EventHandler<CharacterCreationState>? SaveRequested;
     public event EventHandler<CharacterCreationCheckpointEventArgs>? CheckpointSaveRequested;
     public event EventHandler<CharacterCreationCompleteEventArgs>? CompleteRequested;
-    public event EventHandler? CancelRequested;
+    public event EventHandler<CharacterCreationCancelEventArgs>? CancelRequested;
 
     public NewCharacterWizardControl()
     {
@@ -41,6 +43,9 @@ public partial class NewCharacterWizardControl : UserControl
         HomeworldStep.ValidityChanged += OnHomeworldValidityChanged;
         CharacteristicsStep.ValidityChanged += OnCharacteristicsValidityChanged;
         BackgroundSkillsStep.ValidityChanged += OnBackgroundSkillsValidityChanged;
+        CareerTermsStep.ValidityChanged += OnCareerTermsValidityChanged;
+        CareerTermsStep.TermActivityChanged += OnCareerTermsTermActivityChanged;
+        CareerTermsStep.CancelCharacterCreationRequested += OnCareerTermsCancelCharacterCreationRequested;
     }
 
     public void LoadState(CharacterCreationState state)
@@ -49,6 +54,8 @@ public partial class NewCharacterWizardControl : UserControl
         _state.CurrentStepIndex = Math.Clamp(_state.CurrentStepIndex, 0, StepNames.Length - 1);
         _state.Character.Homeworld ??= new();
         _state.BackgroundSkills ??= new();
+        _state.CareerTerms ??= new();
+        CareerTermService.Normalize(_state.CareerTerms);
         BiographyStep.LoadCharacter(_state.Character);
         HomeworldStep.LoadState(_state);
         UpdateStep();
@@ -83,6 +90,7 @@ public partial class NewCharacterWizardControl : UserControl
 
         if (_state.CurrentStepIndex >= StepNames.Length - 1)
         {
+            _state.Character.CareerTerms = _state.CareerTerms;
             var creationCapViolations = SkillAdjustmentService.GetCreationCapViolations(_state.Character);
             if (creationCapViolations.Count > 0)
             {
@@ -107,9 +115,10 @@ public partial class NewCharacterWizardControl : UserControl
         var previousStepIndex = _state.CurrentStepIndex;
         _state.CurrentStepIndex++;
 
-        if (_state.CurrentStepIndex == 4)
+        if (_state.CurrentStepIndex == 5)
         {
             _state.Character.CaptureFinalCharacteristics();
+            _state.Character.CareerTerms = _state.CareerTerms;
         }
 
         if (!TrySaveCheckpoint())
@@ -123,13 +132,19 @@ public partial class NewCharacterWizardControl : UserControl
 
     private void OnSave(object sender, RoutedEventArgs e)
     {
+        if (_state.CurrentStepIndex == 4 && !CareerTermsStep.CanSave())
+        {
+            FooterMessageText.Text = "Finish the active Career Term before saving.";
+            return;
+        }
+
         CaptureCurrentStep();
         SaveRequested?.Invoke(this, _state);
     }
 
     private void OnCancel(object sender, RoutedEventArgs e)
     {
-        CancelRequested?.Invoke(this, EventArgs.Empty);
+        CancelRequested?.Invoke(this, new CharacterCreationCancelEventArgs());
     }
 
     private void OnBiographyValidityChanged(object? sender, EventArgs e)
@@ -162,6 +177,28 @@ public partial class NewCharacterWizardControl : UserControl
         {
             NextButton.IsEnabled = BackgroundSkillsStep.IsComplete();
         }
+    }
+
+    private void OnCareerTermsValidityChanged(object? sender, EventArgs e)
+    {
+        if (_state.CurrentStepIndex == 4)
+        {
+            NextButton.IsEnabled = CareerTermsStep.IsComplete();
+            UpdateSaveButton();
+        }
+    }
+
+    private void OnCareerTermsTermActivityChanged(object? sender, EventArgs e)
+    {
+        if (_state.CurrentStepIndex == 4)
+        {
+            UpdateSaveButton();
+        }
+    }
+
+    private void OnCareerTermsCancelCharacterCreationRequested(object? sender, CharacterCreationCancelEventArgs e)
+    {
+        CancelRequested?.Invoke(this, e);
     }
 
     private void CaptureCurrentStep()
@@ -206,7 +243,11 @@ public partial class NewCharacterWizardControl : UserControl
         {
             BackgroundSkillsStep.LoadState(_state);
         }
-        else if (_state.CurrentStepIndex == 4 &&
+        else if (_state.CurrentStepIndex == 4)
+        {
+            CareerTermsStep.LoadState(_state);
+        }
+        else if (_state.CurrentStepIndex == 5 &&
                  HasCharacteristics(_state.Character.CurrentCharacteristics) &&
                  !HasCharacteristics(_state.Character.FinalCharacteristics))
         {
@@ -217,7 +258,8 @@ public partial class NewCharacterWizardControl : UserControl
         HomeworldStep.Visibility = _state.CurrentStepIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
         CharacteristicsStep.Visibility = _state.CurrentStepIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
         BackgroundSkillsStep.Visibility = _state.CurrentStepIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
-        ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
+        CareerTermsStep.Visibility = _state.CurrentStepIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
+        ReviewPlaceholder.Visibility = _state.CurrentStepIndex == 5 ? Visibility.Visible : Visibility.Collapsed;
 
         WizardStatusText.Text = $"Step {_state.CurrentStepIndex + 1} of {StepNames.Length}";
         NextButton.Content = _state.CurrentStepIndex == StepNames.Length - 1 ? "Complete" : "Next";
@@ -227,9 +269,11 @@ public partial class NewCharacterWizardControl : UserControl
             1 => HomeworldStep.IsComplete(),
             2 => CharacteristicsStep.IsComplete(),
             3 => BackgroundSkillsStep.IsComplete(),
+            4 => CareerTermsStep.IsComplete(),
             _ => true
         };
         FooterMessageText.Text = string.Empty;
+        UpdateSaveButton();
 
         UpdateBackground();
         UpdateStepIndicators();
@@ -250,10 +294,15 @@ public partial class NewCharacterWizardControl : UserControl
             case 2:
                 CharacteristicsStep.ResetView();
                 break;
-            case 4:
+            case 5:
                 ResetReviewView();
                 break;
         }
+    }
+
+    private void UpdateSaveButton()
+    {
+        SaveButton.IsEnabled = _state.CurrentStepIndex != 4 || CareerTermsStep.CanSave();
     }
 
     private void ResetReviewView()
@@ -281,6 +330,7 @@ public partial class NewCharacterWizardControl : UserControl
             HomeworldStepIndicator,
             CharacteristicsStepIndicator,
             BackgroundSkillsStepIndicator,
+            CareerTermsStepIndicator,
             ReviewStepIndicator
         };
 
@@ -346,6 +396,8 @@ public partial class NewCharacterWizardControl : UserControl
             FormatCharacteristicSection("Final Characteristics", character.FinalCharacteristics) +
             "\n" +
             FormatSkillSection(character) +
+            "\n" +
+            FormatCareerTermsSection(_state.CareerTerms) +
             "\n" +
             $"Homeworld: {ValueOrPending(character.Homeworld.Name)}\n" +
             $"Homeworld UWP: {character.Homeworld.Uwp}\n" +
@@ -436,6 +488,31 @@ public partial class NewCharacterWizardControl : UserControl
             {
                 lines.Add($"{skillName} ({FormatSpecialtyName(catalog, specialty.SpecialtyId)}): {specialty.Value}");
             }
+        }
+
+        return string.Join('\n', lines) + "\n";
+    }
+
+    private static string FormatCareerTermsSection(CareerTermsState careerTerms)
+    {
+        CareerTermService.Normalize(careerTerms);
+        if (careerTerms.CompletedTerms.Count == 0)
+        {
+            return "Career Terms: None\n";
+        }
+
+        var lines = new List<string> { "Career Terms" };
+        foreach (var term in careerTerms.CompletedTerms.OrderBy(term => term.Sequence))
+        {
+            var eventInfo = !string.IsNullOrWhiteSpace(term.MishapSummary)
+                ? term.MishapSummary
+                : string.IsNullOrWhiteSpace(term.EventSummary)
+                    ? "No Event recorded."
+                    : term.EventSummary;
+
+            lines.Add(
+                $"Term {term.Sequence}: {term.Career} / {term.Assignment}; " +
+                $"Rank {term.EndingRank}; {eventInfo}");
         }
 
         return string.Join('\n', lines) + "\n";
@@ -617,4 +694,9 @@ public sealed class CharacterCreationCompleteEventArgs : EventArgs
     public CharacterCreationState State { get; }
     public bool Succeeded { get; set; }
     public string ErrorMessage { get; set; } = string.Empty;
+}
+
+public sealed class CharacterCreationCancelEventArgs : EventArgs
+{
+    public bool Cancelled { get; set; }
 }

@@ -1,0 +1,114 @@
+<UserControl x:Class="TravellerTales.Views.CareerTermsStepControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="CareerTermButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="38" />
+            <Setter Property="MinWidth" Value="150" />
+            <Setter Property="Padding" Value="18,6" />
+            <Setter Property="Margin" Value="8,0,0,0" />
+            <Setter Property="Background" Value="#CC061521" />
+            <Setter Property="BorderBrush" Value="#8CE8FF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#EAFBFF" />
+            <Setter Property="FontFamily" Value="{StaticResource LabelButtonFontFamily}" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#DD0D2A3C" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#C9F5FF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#EE174A64" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#CC2A0610" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#7A1E1E" />
+                                <Setter Property="Foreground" Value="#8B9AA2" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="#C006111E"
+            BorderBrush="#5FD9FF"
+            BorderThickness="1"
+            Padding="42">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="18" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock x:Name="SummaryText"
+                       Style="{StaticResource BodyTextStyle}"
+                       FontSize="22"
+                       LineHeight="31"
+                       Foreground="#BEDFFF"
+                       TextWrapping="Wrap" />
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="CurrentCareerText"
+                           Style="{StaticResource DataFieldTextStyle}"
+                           FontSize="22"
+                           Foreground="#EAFBFF"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button x:Name="StartTermButton"
+                            Content="Start Next Term"
+                            Click="OnStartNextTerm"
+                            Style="{StaticResource CareerTermButtonStyle}" />
+                    <Button x:Name="FinishButton"
+                            Content="Finish Career Creation"
+                            Click="OnFinish"
+                            Style="{StaticResource CareerTermButtonStyle}" />
+                </StackPanel>
+            </Grid>
+
+            <ScrollViewer Grid.Row="4"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="TermsPanel" />
+            </ScrollViewer>
+
+            <TextBlock x:Name="ValidationText"
+                       Grid.Row="5"
+                       Style="{StaticResource BodyTextStyle}"
+                       FontSize="18"
+                       Foreground="#FFB36A"
+                       TextWrapping="Wrap"
+                       Margin="0,18,0,0" />
+        </Grid>
+    </Border>
+</UserControl>
